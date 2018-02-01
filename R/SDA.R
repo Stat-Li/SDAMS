@@ -1,8 +1,3 @@
-# handle the singular hessian matrix
-# log-likelihood ratio test
-# fix the previous ones could only handle balanced group size
-# update1: return LRT p-values for each part
-# update2: do aft with at least 2 non-0 in each group
 
 aft_model1<- function(data_feature, data_group,binit=0,bw=1){
   x <- data_group; y <- data_feature
@@ -140,8 +135,6 @@ SDA.unit = function(featurevec, grouping,bw=1){
     X2pv = 1-pchisq(diff.total,2)
   }
 
-  # return(list(pointest=c(coef_logit, coef_aft),seest=c(se_logit, se_aft),
-  #             statistic=c(diff.dev.logit,diff.dev.aft),X1pvalue=c(p_logit,p_aft),X2pvalue=X2pv))
   return(list(pointest=c(coef_logit, coef_aft),X1pvalue=c(p_logit,p_aft),X2pvalue=X2pv))
 }
 
