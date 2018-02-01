@@ -1,0 +1,214 @@
+%\VignetteIndexEntry{SDAMS Vignette}
+%\VignettePackage{SDAMS}
+%\VignetteKeyword{Semi-parametric Differential Adundance Analysis}
+
+\documentclass[12pt]{article}
+
+\usepackage{float}
+\usepackage{Sweave}
+
+\usepackage{amssymb}
+
+
+\RequirePackage{Bioconductor}
+\AtBeginDocument{\bibliographystyle{unsrturl}}
+
+\renewcommand{\baselinestretch}{1.3}
+
+
+\SweaveOpts{keep.source=TRUE,eps=FALSE,include=TRUE,width=4,height=4}
+
+
+
+\author{Yuntong Li$^{1}$, Chi Wang$^{2,3}$\footnote{to whom correspondence
+should be addressed}, Li Chen$^{2,3}$\footnote{to whom correspondence
+should be addressed}\\[1em]
+\small{$^{1}$Department of Statistics , University of Kentucky,Lexington, KY;}\\
+\small{$^{2}$Markey Cancer Center, University of Kentucky, Lexington, KY ;}\\
+\small{$^{3}$Department of Biostatistics, University of Kentucky,
+Lexington, KY;}\\
+\small{\texttt{yuntong.li@uky.edu}}\\
+\small{\texttt{chi.wang@uky.edu}}\\
+\small{\texttt{lichenuky@uky.edu}}}
+
+
+
+\title{\textsf{\textbf{The SDAMS package}}}
+
+%\bibliographystyle{abbrv}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\maketitle
+
+\begin{abstract}
+This vignette introduces the use of the Bioconductor package
+{\tt SDAMS}, which is designed for differential abundance analysis for
+metabolomics and proteomics data from mass spectrometry. These data may not be
+normally distributed and contain a large fraction of zero values. {\tt SDAMS}
+considers a two-part semi-parametric mdoel, a logistic regression for the zero
+proportion and a semi-parametric log-linear model for the non-zero values. A
+kernel-smoothed likelihood method is proposed to estimate regression
+coefficients in the two-part model and a likelihood ratio test is constructed
+for differential abundant analysis.
+
+\end{abstract}
+
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+
+\section{Citation}
+The package {\tt SDAMS} implements statistical methods from the following
+publication. If you use {\tt SDAMS} in the published research, please cite: \\
+Yuntong Li, Teresa W.M. Fan, Andrew N. Lane, Woo-Young Kang, Susanne M. Arnold,
+Arnold J. Stromberg, Chi Wang and Li Chen: A Two-Part Semi-Parametric Model for
+Metabolomics and Proteomics Data. (Manuscript)
+
+\section{Quick Start}
+This section show the most basic {\tt SDAMS} work flow for a differential
+abundance analysis for metabolomics and proteomics data:
+\begin{enumerate}
+\item Create a {\tt MSset} object using function {\tt createMSsetFromEnvir} or
+      {\tt createMSsetFromCSV}.
+      In this section we use an example {\tt MSset} directly, which is an object
+      of {\tt MSset} class named {\tt exampleMSset} contained in this package.
+\item Perform a differential abundance analysis using {\tt SDA}.
+\end{enumerate}
+
+
+<<quick start , eval=FALSE >>=
+library("SDAMS")
+data("exampleMSset")
+results=SDA(exampleMSset)
+@
+
+Here, the MSset class {\tt exampleMSset} contained in the package is the
+proteomics dataset, which has two categories, a matrix for proteomics features
+and a single column phenotype data for grouping information. There are 560
+features for 202 experimental subjects (0 for control and 1 for patient). This
+is a 10\% subsample of the original dataset. Each row in this matrix repressents
+a proteomics feature. See Reference~ \cite{siwy2011human} for detailed
+information regarding this dataset.
+
+
+
+\section{Data Input}
+
+
+\subsection{Create MSset from csv.files}
+The proteomics or metabolomics data is stroed as a matrix with each
+row being a feature and each column corresponding to a subject. All data in this
+matrix are non-negative. Another information required is the phenotype
+covariates. Here we focus on the binary grouping information, such as numeric 1
+for control group and 0 for case group. But it can also be characters, such as
+"healthy" and "disease". To utlize {\tt SDAMS} package, we should have two
+separate csv.files (for example 'feature.csv' and 'group.csv') as inputs for
+{\tt createMSsetfromCSV} to creat a {\tt MSset} object.
+
+Note:
+\begin{enumerate}
+\item The $1^{st}$ column in 'feature.csv' represents feature names and the
+      $1^{st}$ row represents subject codes.
+\item The $1^{st}$ column in 'group.csv' represents subject codes, for example,
+      Subject1, Subject2....
+\end{enumerate}
+
+
+The format for "csv.files" should looks like as Figure~\ref{example feature}
+and Figure~\ref{example group}:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics{feature.PNG}
+  \caption{Example of 'feature.csv' pattern}
+  \label{example feature}
+\end{figure}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=2cm]{group.PNG}
+  \caption{Example of 'group.csv' pattern}
+  \label{example group}
+\end{figure}
+
+
+After creating the two csv.files, we need the paths for the two csv.files:
+
+<<directory, eval=FALSE>>=
+path1 <- "/path/to/your/feature.csv/"
+path2 <- "/path/to/your/group.csv/"
+@
+
+Here for demonstration purposes, we use the data in the {\tt SDA} package
+
+<<GetDirectory>>=
+directory1 <- system.file("extdata", package="SDAMS", mustWork=TRUE)
+path1<-paste(directory1,"ProstateFeature.csv",sep="/")
+directory2 <- system.file("extdata", package="SDAMS", mustWork=TRUE)
+path2<-paste(directory2,"ProstateGroup.csv",sep="/")
+@
+
+then use the function {\tt getMSsetfromCSV} after loading the {\tt SDA} package
+<<CsvInput>>=
+library("SDAMS")
+exampleMSset1 = createMSsetfromCSV(path1,path2)
+exampleMSset1
+head(featuredata(exampleMSset1)[,1:10])
+head(phenotypedata(exampleMSset1))
+@
+
+
+
+\subsection{Create MSset from R global environment}
+If the two datasets have been already claeaned and loaded into the R global
+environment, we can use {\tt createMSsetFromEnvir} to create a {\tt MSset} object.
+
+<<MatrixInput>>=
+set.seed(100)
+featureInfo = matrix(runif(800,-2,5),ncol = 40)
+featureInfo[featureInfo<0] = 0
+rownames(featureInfo) = paste("feature",1:20,sep = '')
+colnames(featureInfo) = paste('subject',1:40,sep = '')
+groupInfo = data.frame(grouping=matrix(sample(0:1,40,replace = TRUE),ncol = 1))
+rownames(groupInfo)=colnames(featureInfo)
+exampleMSset2 = createMSsetFromEnvir(feature = featureInfo,group = groupInfo)
+exampleMSset2
+head(featuredata(exampleMSset2)[,1:10])
+head(phenotypedata(exampleMSset2))
+
+@
+
+\section{Data Analysis}
+
+Finally, we perform differential abundance analyais using {\tt MSset} created in
+the last section. This can be done by using function {\tt SDA}. And a list with
+point estimates, p-values, q-values and corresponding feature names is returned.
+Below is results generated by using the {\tt MSset} exampleMSset1.
+
+<<result1>>=
+results = SDA(exampleMSset1)
+head(results$gamma)
+head(results$beta)
+head(results$qv_gamma)
+head(results$qv_beta)
+head(results$qv_2part)
+head(results$feat.names)
+@
+
+
+
+\section{Session Info}
+
+<<sessionInfo, results=tex, print=TRUE, eval=TRUE>>=
+toLatex(sessionInfo())
+@
+
+
+\bibliography{reference}
+
+
+\end{document}

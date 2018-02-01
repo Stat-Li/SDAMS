@@ -1,0 +1,12 @@
+import( 'trust' )
+import( 'qvalue' )
+import( 'Biobase' )
+import( 'methods' )
+exportClasses("MSset")
+exportMethods(
+              featuredata, "featuredata<-",
+              phenotypedata, "phenotypedata<-"
+              )
+
+export('createMSsetFromEnvir', 'createMSsetfromCSV', 'SDA')
+
