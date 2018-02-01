@@ -143,7 +143,7 @@ path1 <- "/path/to/your/feature.csv/"
 path2 <- "/path/to/your/group.csv/"
 @
 
-Here for demonstration purposes, we use the data in the {\tt SDA} package
+Here for demonstration purposes, we use the data in the {\tt SDAMS} package
 
 <<GetDirectory>>=
 directory1 <- system.file("extdata", package="SDAMS", mustWork=TRUE)
@@ -152,7 +152,8 @@ directory2 <- system.file("extdata", package="SDAMS", mustWork=TRUE)
 path2<-paste(directory2,"ProstateGroup.csv",sep="/")
 @
 
-then use the function {\tt getMSsetfromCSV} after loading the {\tt SDA} package
+then use the function {\tt getMSsetfromCSV} after loading the {\tt SDAMS} 
+package
 <<CsvInput>>=
 library("SDAMS")
 exampleMSset1 = createMSsetfromCSV(path1,path2)
