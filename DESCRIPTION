@@ -1,12 +1,12 @@
 Package: SDAMS
 Type: Package
 Title: Differential Abundant Analysis for Metabolomics and Proteomics Data
-Version: 0.99.3
+Version: 0.99.4
 Date: 2018-1-30
 Author: Yuntong Li <yuntong.li@uky.edu>, Chi Wang <chi.wang@uky.edu>, 
      Li Chen <lichenuky@uky.edu>
 Maintainer: Yuntong Li <yuntong.li@uky.edu>
-Depends: R(>= 3.4.0)
+Depends: R(>= 3.4.3)
 Suggests: testthat
 Imports: trust, qvalue, Biobase, methods
 Description: This Package utilizes a Semi-parametric Differential Abundance 
@@ -14,6 +14,6 @@ Description: This Package utilizes a Semi-parametric Differential Abundance
      spectrometry. SDA is able to robustly handle non-normally distributed data 
      and provides a clear quantification of the effect size.
 License: GPL
-Encoding: UTF-8
-LazyData: true
+LazyLoad: no
+NeedsCompilation: no
 biocViews: DifferentialExpression, Metabolomics, Proteomics, MassSpectrometry
