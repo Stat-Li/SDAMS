@@ -124,13 +124,13 @@ and Figure~\ref{example group}:
 
 \begin{figure}[h!]
   \centering
-  \includegraphics{feature.PNG}
+  \includegraphics{feature.png}
   \caption{Example of 'feature.csv' pattern}
   \label{example feature}
 \end{figure}
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=2cm]{group.PNG}
+  \includegraphics[width=2cm]{group.png}
   \caption{Example of 'group.csv' pattern}
   \label{example group}
 \end{figure}

@@ -4,9 +4,15 @@ import( 'Biobase' )
 import( 'methods' )
 exportClasses("MSset")
 exportMethods(
-              featuredata, "featuredata<-",
-              phenotypedata, "phenotypedata<-"
+              featuredata, 
+	      "featuredata<-",
+              phenotypedata, 
+              "phenotypedata<-"
               )
 
-export('createMSsetFromEnvir', 'createMSsetfromCSV', 'SDA')
+export(
+       'createMSsetFromEnvir', 
+       'createMSsetfromCSV', 
+       'SDA'
+       )
 

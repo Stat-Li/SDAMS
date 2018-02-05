@@ -21,7 +21,8 @@ setGeneric("phenotypedata<-", function(object, value) standardGeneric(
 setMethod("phenotypedata", signature(object = "MSset"), function(object) {
   pData(object)
 })
-setReplaceMethod("phenotypedata", signature(object = "MSset", value = "data.frame"),
+setReplaceMethod("phenotypedata", signature(object = "MSset", 
+                                            value = "data.frame"),
                  function(object, value) {
                    pData(object) <- value
                    object
