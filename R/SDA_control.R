@@ -1,10 +1,10 @@
 
-SDA = function(MSset){
+SDA = function(sumExpset){
 
-    if (!is(MSset, "MSset"))
-        stop("Input must be an object of MSset class!")
+    if (!is(sumExpset, "SummarizedExperiment"))
+        stop("Input must be an object of SummarizedExperiment class!")
 
-    rawfeature = featuredata(MSset); rawgroup = phenotypedata(MSset)
+    rawfeature = assay(sumExpset); rawgroup = colData(sumExpset)$grouping
     newdata = data_clean(rawfeature,rawgroup)
     newfeature = newdata$feature
     newgroup = newdata$group

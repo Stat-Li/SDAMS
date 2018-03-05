@@ -1,18 +1,17 @@
-import( 'trust' )
-import( 'qvalue' )
-import( 'Biobase' )
-import( 'methods' )
-exportClasses("MSset")
-exportMethods(
-              featuredata, 
-	      "featuredata<-",
-              phenotypedata, 
-              "phenotypedata<-"
-              )
+import("trust")
+import("qvalue")
+import("methods")
+import("SummarizedExperiment")
 
-export(
-       'createMSsetFromEnvir', 
-       'createMSsetfromCSV', 
-       'SDA'
-       )
+importFrom("stats", "IQR")
+importFrom("stats", "dnorm")
+importFrom("stats", "glm")
+importFrom("stats", "model.matrix")
+importFrom("stats", "pchisq")
+importFrom("stats", "pnorm")
+importFrom("stats", "sd")
+importFrom("utils", "read.csv")
 
+export("createSEsetFromEnvir")
+export("createSEsetFromCSV")
+export("SDA")

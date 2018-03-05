@@ -1,5 +1,5 @@
 
-aft_model1<- function(data_feature, data_group, binit=0, bw=1){
+aft_model <- function(data_feature, data_group, binit=0, bw=1){
   x <- data_group; y <- data_feature
   n <- length(y)
 
@@ -17,12 +17,11 @@ aft_model1<- function(data_feature, data_group, binit=0, bw=1){
       min(sd(log(y)-as.vector(x%*%as.matrix(binit))),
           IQR(log(y)-as.vector(x%*%as.matrix(binit)))/1.34)*n^(-1/3)}
 
-  kern <- dnorm ##kernel function: standard normal function
+  kern <- dnorm 
   kern.1st <- function(x){-x*dnorm(x)}
   kern.2nd <- function(x){(x^2-1)*dnorm(x)}
   kern.cdf <- pnorm
 
-  ##-------------paired difference between each error----------------------
   e_diff <- function(beta.iter,x,y){
     e.diff <- outer(-log(y)+as.vector(t(x%*%as.matrix(beta.iter))),
                    log(y)-as.vector(t(x%*%as.matrix(beta.iter))), '+')
@@ -110,7 +109,7 @@ SDA.unit = function(featurevec, grouping,bw=1){
 
   if(any(non0_cnt==group_size)){
     coef_logit=NA; se_logit=NA
-    aft_summary <- aft_model1(data_AFT$featurevec, data_AFT$grouping,bw=bw)
+    aft_summary <- aft_model(data_AFT$featurevec, data_AFT$grouping,bw=bw)
     coef_aft <- aft_summary$pointest; se_aft <- aft_summary$seest
     diff.dev.logit = 0
     diff.dev.aft = aft_summary$null.deviance-aft_summary$residual.deviance
@@ -131,7 +130,7 @@ SDA.unit = function(featurevec, grouping,bw=1){
     logit_summary <- summary(logit_reg)
     coef_logit <- logit_summary$coefficients[2,1]
     se_logit <- logit_summary$coefficients[2,2]
-    aft_summary <- aft_model1(data_AFT$featurevec, data_AFT$grouping,bw=bw)
+    aft_summary <- aft_model(data_AFT$featurevec, data_AFT$grouping,bw=bw)
     coef_aft <- aft_summary$pointest; se_aft <- aft_summary$seest
     diff.dev.logit = logit_summary$null.deviance-logit_summary$deviance
     diff.dev.aft = aft_summary$null.deviance-aft_summary$residual.deviance

@@ -44,13 +44,13 @@ Lexington, KY;}\\
 \begin{abstract}
 This vignette introduces the use of the Bioconductor package
 {\tt SDAMS}, which is designed for differential abundance analysis for
-metabolomics and proteomics data from mass spectrometry. These data may not be
-normally distributed and contain a large fraction of zero values. {\tt SDAMS}
-considers a two-part semi-parametric mdoel, a logistic regression for the zero
-proportion and a semi-parametric log-linear model for the non-zero values. A
-kernel-smoothed likelihood method is proposed to estimate regression
-coefficients in the two-part model and a likelihood ratio test is constructed
-for differential abundant analysis.
+metabolomics and proteomics data from mass spectrometry. These data may contain
+a large fraction of zero values and non-zero part may not be normally
+distributed. {\tt SDAMS} considers a two-part semi-parametric mdoel, a logistic
+regression for the zero proportion and a semi-parametric log-linear model for
+the non-zero values. A kernel-smoothed likelihood method is proposed to estimate
+regression coefficients in the two-part model and a likelihood ratio test is
+constructed for differential abundant analysis.
 
 \end{abstract}
 
@@ -73,34 +73,35 @@ Metabolomics and Proteomics Data. (Manuscript)
 This section show the most basic {\tt SDAMS} work flow for a differential
 abundance analysis for metabolomics and proteomics data:
 \begin{enumerate}
-\item Create a {\tt MSset} object using function {\tt createMSsetFromEnvir} or
-      {\tt createMSsetFromCSV}.
-      In this section we use an example {\tt MSset} directly, which is an object
-      of {\tt MSset} class named {\tt exampleMSset} contained in this package.
+\item Create a {\tt SummarizedExperiment} object using function
+      {\tt createSEsetFromEnvir} or {\tt createSEsetFromCSV}.
+      In this section we use an example {\tt SummarizedExperiment} set directly,
+      which is an object of {\tt SummarizedExperiment} class named
+      {\tt exampleSumExpset} contained in this package.
 \item Perform a differential abundance analysis using {\tt SDA}.
 \end{enumerate}
 
 
 <<quick start , eval=FALSE >>=
 library("SDAMS")
-data("exampleMSset")
-results=SDA(exampleMSset)
+data("exampleSumExpset")
+results=SDA(exampleSumExpset)
 @
 
-Here, the MSset class {\tt exampleMSset} contained in the package is the
-proteomics dataset, which has two categories, a matrix for proteomics features
-and a single column phenotype data for grouping information. There are 560
-features for 202 experimental subjects (0 for control and 1 for patient). This
-is a 10\% subsample of the original dataset. Each row in this matrix repressents
-a proteomics feature. See Reference~ \cite{siwy2011human} for detailed
-information regarding this dataset.
+Here, the {\tt SummarizedExperiment} class {\tt exampleSumExpset} contained in
+the package is the proteomics dataset, which a matrix-like container for
+proteomics features with experimental subject grouping information. There are
+560 features for 202 experimental subjects (0 for control and 1 for patient).
+This is a 10\% subsample of the original dataset. Each row in this matrix
+repressents a proteomics feature. See Reference~ \cite{siwy2011human} for
+detailed information regarding this dataset.
 
 
 
 \section{Data Input}
 
 
-\subsection{Create MSset from csv.files}
+\subsection{Create SummarizedExperiment object from csv.files}
 The proteomics or metabolomics data is stroed as a matrix with each
 row being a feature and each column corresponding to a subject. All data in this
 matrix are non-negative. Another information required is the phenotype
@@ -108,7 +109,7 @@ covariates. Here we focus on the binary grouping information, such as numeric 1
 for control group and 0 for case group. But it can also be characters, such as
 "healthy" and "disease". To utlize {\tt SDAMS} package, we should have two
 separate csv.files (for example 'feature.csv' and 'group.csv') as inputs for
-{\tt createMSsetfromCSV} to creat a {\tt MSset} object.
+{\tt createSEsetfromCSV} to creat a {\tt SummarizedExperiment} object.
 
 Note:
 \begin{enumerate}
@@ -152,21 +153,26 @@ directory2 <- system.file("extdata", package="SDAMS", mustWork=TRUE)
 path2<-paste(directory2,"ProstateGroup.csv",sep="/")
 @
 
-then use the function {\tt getMSsetfromCSV} after loading the {\tt SDAMS}
-package
+then use the function {\tt createSEsetFromCSV} after loading the {\tt SDAMS}
+package.
 <<CsvInput>>=
 library("SDAMS")
-exampleMSset1 = createMSsetfromCSV(path1,path2)
-exampleMSset1
-head(featuredata(exampleMSset1)[,1:10])
-head(phenotypedata(exampleMSset1))
+exampleSEset1 = createSEsetFromCSV(path1,path2)
+exampleSEset1
+@
+
+The feature data and grouping information can be accessed using
+{\tt SummarizedExperiment} command:
+<<Accessors>>=
+head(assay(exampleSEset1)[,1:10])
+head(colData(exampleSEset1)$grouping)
 @
 
 
-
-\subsection{Create MSset from R global environment}
+\subsection{Create SummarizedExperiment object from R global environment}
 If the two datasets have been already claeaned and loaded into the R global
-environment, we can use {\tt createMSsetFromEnvir} to create a {\tt MSset} object.
+environment, we can use {\tt createSEsetFromEnvir} to create a
+{\tt SummarizedExperiment} object.
 
 <<MatrixInput>>=
 set.seed(100)
@@ -176,22 +182,23 @@ rownames(featureInfo) = paste("feature",1:20,sep = '')
 colnames(featureInfo) = paste('subject',1:40,sep = '')
 groupInfo = data.frame(grouping=matrix(sample(0:1,40,replace = TRUE),ncol = 1))
 rownames(groupInfo)=colnames(featureInfo)
-exampleMSset2 = createMSsetFromEnvir(feature = featureInfo,group = groupInfo)
-exampleMSset2
-head(featuredata(exampleMSset2)[,1:10])
-head(phenotypedata(exampleMSset2))
+exampleSEset2 = createSEsetFromEnvir(feature = featureInfo,group = groupInfo)
+exampleSEset2
+head(assay(exampleSEset2)[,1:10])
+head(colData(exampleSEset2)$grouping)
 
 @
 
 \section{Data Analysis}
 
-Finally, we perform differential abundance analyais using {\tt MSset} created in
-the last section. This can be done by using function {\tt SDA}. And a list with
-point estimates, p-values, q-values and corresponding feature names is returned.
-Below is results generated by using the {\tt MSset} exampleMSset1.
+Finally, we perform differential abundance analyais using
+{\tt SummarizedExperiment} object created in the last section. This can be done
+by using function {\tt SDA}. And a list with point estimates, p-values, q-values
+and corresponding feature names is returned. Below is results generated by using
+the {\tt SummarizedExperiment} object exampleSEset1.
 
-<<result1>>=
-results = SDA(exampleMSset1)
+<<results>>=
+results = SDA(exampleSEset1)
 head(results$gamma)
 head(results$beta)
 head(results$qv_gamma)

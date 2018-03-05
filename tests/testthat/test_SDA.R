@@ -8,6 +8,6 @@ colnames(featureInfo) = sub.names
 groupInfo = data.frame(grouping=matrix(sample(0:1,40,replace = TRUE),ncol = 1))
 rownames(groupInfo)=colnames(featureInfo)
 
-msdata = list(feature = featureInfo, group = groupInfo)
+SEdata = list(feature = featureInfo, group = groupInfo)
 
-expect_error(SDA(msdata))
+expect_error(SDA(SEdata))

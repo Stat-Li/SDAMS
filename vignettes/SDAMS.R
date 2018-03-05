@@ -4,8 +4,8 @@
 ### code chunk number 1: quick start (eval = FALSE)
 ###################################################
 # library("SDAMS")
-# data("exampleMSset")
-# results=SDA(exampleMSset)
+# data("exampleSumExpset")
+# results=SDA(exampleSumExpset)
 
 
 ###################################################
@@ -27,14 +27,17 @@ path2<-paste(directory2,"ProstateGroup.csv",sep="/")
 ### code chunk number 4: CsvInput
 ###################################################
 library("SDAMS")
-exampleMSset1 = createMSsetfromCSV(path1,path2)
-exampleMSset1
-head(featuredata(exampleMSset1)[,1:10])
-head(phenotypedata(exampleMSset1))
-
+exampleSEset1 = createSEsetFromCSV(path1,path2)
+exampleSEset1
 
 ###################################################
-### code chunk number 5: MatrixInput
+### code chunk number 5: Accessors
+###################################################
+head(assay(exampleSEset1)[,1:10])
+head(colData(exampleSEset1)$grouping)
+
+###################################################
+### code chunk number 6: MatrixInput
 ###################################################
 set.seed(100)
 featureInfo = matrix(runif(800,-2,5),ncol = 40)
@@ -43,17 +46,16 @@ rownames(featureInfo) = paste("feature",1:20,sep = '')
 colnames(featureInfo) = paste('subject',1:40,sep = '')
 groupInfo = data.frame(grouping=matrix(sample(0:1,40,replace = TRUE),ncol = 1))
 rownames(groupInfo)=colnames(featureInfo)
-exampleMSset2 = createMSsetFromEnvir(feature = featureInfo,group = groupInfo)
-exampleMSset2
-head(featuredata(exampleMSset2)[,1:10])
-head(phenotypedata(exampleMSset2))
-
+exampleSEset2 = createSEsetFromEnvir(feature = featureInfo,group = groupInfo)
+exampleSEset2
+head(assay(exampleSEset2)[,1:10])
+head(colData(exampleSEset2)$grouping)
 
 
 ###################################################
-### code chunk number 6: result1
+### code chunk number 7: results
 ###################################################
-results = SDA(exampleMSset1)
+results = SDA(exampleSEset1)
 head(results$gamma)
 head(results$beta)
 head(results$qv_gamma)
@@ -63,7 +65,7 @@ head(results$feat.names)
 
 
 ###################################################
-### code chunk number 7: sessionInfo (eval = True)
+### code chunk number 8: sessionInfo (eval = True)
 ###################################################
 toLatex(sessionInfo())
 

@@ -1,6 +1,5 @@
 \name{SDA}
 \alias{SDA}
-\alias{SDA,MSset-method}
 
 \title{
 semi-parametric differential abuandance analysis
@@ -12,12 +11,12 @@ coefficients. And likelihood ratio test is constructed for differential
 abundance analysis.
 }
 \usage{
-SDA(MSset)
+SDA(sumExpset)
 }
 
 \arguments{
-  \item{MSset}{
-An object of 'MSset' class.
+  \item{sumExpset}{
+An object of 'SummarizedExperiment' class.
 }
 
 }
@@ -41,16 +40,13 @@ Chi Wang <chi.wang@uky.edu>,
 Li Chen <lichenuky@uky.edu>
 }
 
-\seealso{
-  \link{MSset-class}
-}
 
 
 \examples{
 ##--------- load data ------------
-data(exampleMSset)
+data(exampleSumExpset)
 
-results = SDA(exampleMSset)
+results = SDA(exampleSumExpset)
 results$qv_2part
 }
 

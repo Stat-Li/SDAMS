@@ -44,13 +44,13 @@ Lexington, KY;}\\
 \begin{abstract}
 This vignette introduces the use of the Bioconductor package
 {\tt SDAMS}, which is designed for differential abundance analysis for
-metabolomics and proteomics data from mass spectrometry. These data may not be
-normally distributed and contain a large fraction of zero values. {\tt SDAMS}
-considers a two-part semi-parametric mdoel, a logistic regression for the zero
-proportion and a semi-parametric log-linear model for the non-zero values. A
-kernel-smoothed likelihood method is proposed to estimate regression
-coefficients in the two-part model and a likelihood ratio test is constructed
-for differential abundant analysis.
+metabolomics and proteomics data from mass spectrometry. These data may contain
+a large fraction of zero values and non-zero part may not be normally
+distributed. {\tt SDAMS} considers a two-part semi-parametric mdoel, a logistic
+regression for the zero proportion and a semi-parametric log-linear model for
+the non-zero values. A kernel-smoothed likelihood method is proposed to estimate
+regression coefficients in the two-part model and a likelihood ratio test is
+constructed for differential abundant analysis.
 
 \end{abstract}
 
@@ -73,10 +73,11 @@ Metabolomics and Proteomics Data. (Manuscript)
 This section show the most basic {\tt SDAMS} work flow for a differential
 abundance analysis for metabolomics and proteomics data:
 \begin{enumerate}
-\item Create a {\tt MSset} object using function {\tt createMSsetFromEnvir} or
-      {\tt createMSsetFromCSV}.
-      In this section we use an example {\tt MSset} directly, which is an object
-      of {\tt MSset} class named {\tt exampleMSset} contained in this package.
+\item Create a {\tt SummarizedExperiment} object using function
+      {\tt createSEsetFromEnvir} or {\tt createSEsetFromCSV}.
+      In this section we use an example {\tt SummarizedExperiment} set directly,
+      which is an object of {\tt SummarizedExperiment} class named
+      {\tt exampleSumExpset} contained in this package.
 \item Perform a differential abundance analysis using {\tt SDA}.
 \end{enumerate}
 
@@ -84,25 +85,25 @@ abundance analysis for metabolomics and proteomics data:
 \begin{Schunk}
 \begin{Sinput}
 > library("SDAMS")
-> data("exampleMSset")
-> results=SDA(exampleMSset)
+> data("exampleSumExpset")
+> results=SDA(exampleSumExpset)
 \end{Sinput}
 \end{Schunk}
 
-Here, the MSset class {\tt exampleMSset} contained in the package is the
-proteomics dataset, which has two categories, a matrix for proteomics features
-and a single column phenotype data for grouping information. There are 560
-features for 202 experimental subjects (0 for control and 1 for patient). This
-is a 10\% subsample of the original dataset. Each row in this matrix repressents
-a proteomics feature. See Reference~ \cite{siwy2011human} for detailed
-information regarding this dataset.
+Here, the {\tt SummarizedExperiment} class {\tt exampleSumExpset} contained in
+the package is the proteomics dataset, which a matrix-like container for
+proteomics features with experimental subject grouping information. There are
+560 features for 202 experimental subjects (0 for control and 1 for patient).
+This is a 10\% subsample of the original dataset. Each row in this matrix
+repressents a proteomics feature. See Reference~ \cite{siwy2011human} for
+detailed information regarding this dataset.
 
 
 
 \section{Data Input}
 
 
-\subsection{Create MSset from csv.files}
+\subsection{Create SummarizedExperiment object from csv.files}
 The proteomics or metabolomics data is stroed as a matrix with each
 row being a feature and each column corresponding to a subject. All data in this
 matrix are non-negative. Another information required is the phenotype
@@ -110,7 +111,7 @@ covariates. Here we focus on the binary grouping information, such as numeric 1
 for control group and 0 for case group. But it can also be characters, such as
 "healthy" and "disease". To utlize {\tt SDAMS} package, we should have two
 separate csv.files (for example 'feature.csv' and 'group.csv') as inputs for
-{\tt createMSsetfromCSV} to creat a {\tt MSset} object.
+{\tt createSEsetfromCSV} to creat a {\tt SummarizedExperiment} object.
 
 Note:
 \begin{enumerate}
@@ -158,29 +159,31 @@ Here for demonstration purposes, we use the data in the {\tt SDAMS} package
 \end{Sinput}
 \end{Schunk}
 
-then use the function {\tt getMSsetfromCSV} after loading the {\tt SDAMS}
-package
+then use the function {\tt createSEsetFromCSV} after loading the {\tt SDAMS}
+package.
 \begin{Schunk}
 \begin{Sinput}
 > library("SDAMS")
-> exampleMSset1 = createMSsetfromCSV(path1,path2)
-> exampleMSset1
+> exampleSEset1 = createSEsetFromCSV(path1,path2)
+> exampleSEset1
 \end{Sinput}
 \begin{Soutput}
-MSset (storageMode: lockedEnvironment)
-assayData: 560 features, 202 samples 
-  element names: exprs 
-protocolData: none
-phenoData
-  sampleNames: 9512 9963 ... 49586 (202 total)
-  varLabels: grouping
-  varMetadata: labelDescription
-featureData: none
-experimentData: use 'experimentData(object)'
-Annotation:  
+class: SummarizedExperiment 
+dim: 560 202 
+metadata(0):
+assays(1): counts
+rownames(560): 93922 87209 ... 180624 130855
+rowData names(0):
+colnames(202): 9512 9963 ... 49341 49586
+colData names(1): grouping
 \end{Soutput}
+\end{Schunk}
+
+The feature data and grouping information can be accessed using
+{\tt SummarizedExperiment} command:
+\begin{Schunk}
 \begin{Sinput}
-> head(featuredata(exampleMSset1)[,1:10])
+> head(assay(exampleSEset1)[,1:10])
 \end{Sinput}
 \begin{Soutput}
         9512   9963  9965  9975   9979  9997 10015  10034  10044 10047
@@ -192,24 +195,18 @@ Annotation:
 42832  52.32 137.76 70.25  0.00 453.23 92.20  0.00 352.55 496.71  0.00
 \end{Soutput}
 \begin{Sinput}
-> head(phenotypedata(exampleMSset1))
+> head(colData(exampleSEset1)$grouping)
 \end{Sinput}
 \begin{Soutput}
-     grouping
-9512        0
-9963        1
-9965        1
-9975        1
-9979        1
-9997        1
+[1] 0 1 1 1 1 1
 \end{Soutput}
 \end{Schunk}
 
 
-
-\subsection{Create MSset from R global environment}
+\subsection{Create SummarizedExperiment object from R global environment}
 If the two datasets have been already claeaned and loaded into the R global
-environment, we can use {\tt createMSsetFromEnvir} to create a {\tt MSset} object.
+environment, we can use {\tt createSEsetFromEnvir} to create a
+{\tt SummarizedExperiment} object.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -220,24 +217,21 @@ environment, we can use {\tt createMSsetFromEnvir} to create a {\tt MSset} objec
 > colnames(featureInfo) = paste('subject',1:40,sep = '')
 > groupInfo = data.frame(grouping=matrix(sample(0:1,40,replace = TRUE),ncol = 1))
 > rownames(groupInfo)=colnames(featureInfo)
-> exampleMSset2 = createMSsetFromEnvir(feature = featureInfo,group = groupInfo)
-> exampleMSset2
+> exampleSEset2 = createSEsetFromEnvir(feature = featureInfo,group = groupInfo)
+> exampleSEset2
 \end{Sinput}
 \begin{Soutput}
-MSset (storageMode: lockedEnvironment)
-assayData: 20 features, 40 samples 
-  element names: exprs 
-protocolData: none
-phenoData
-  sampleNames: subject1 subject2 ... subject40 (40 total)
-  varLabels: grouping
-  varMetadata: labelDescription
-featureData: none
-experimentData: use 'experimentData(object)'
-Annotation:  
+class: SummarizedExperiment 
+dim: 20 40 
+metadata(0):
+assays(1): counts
+rownames(20): feature1 feature2 ... feature19 feature20
+rowData names(0):
+colnames(40): subject1 subject2 ... subject39 subject40
+colData names(1): grouping
 \end{Soutput}
 \begin{Sinput}
-> head(featuredata(exampleMSset2)[,1:10])
+> head(assay(exampleSEset2)[,1:10])
 \end{Sinput}
 \begin{Soutput}
           subject1  subject2  subject3  subject4 subject5  subject6  subject7
@@ -256,16 +250,10 @@ feature5 0.000000 0.000000 0.00000000
 feature6 3.102040 0.000000 0.43647014
 \end{Soutput}
 \begin{Sinput}
-> head(phenotypedata(exampleMSset2))
+> head(colData(exampleSEset2)$grouping)
 \end{Sinput}
 \begin{Soutput}
-         grouping
-subject1        0
-subject2        0
-subject3        0
-subject4        1
-subject5        1
-subject6        0
+[1] 0 0 0 1 1 0
 \end{Soutput}
 \begin{Sinput}
 > 
@@ -274,14 +262,15 @@ subject6        0
 
 \section{Data Analysis}
 
-Finally, we perform differential abundance analyais using {\tt MSset} created in
-the last section. This can be done by using function {\tt SDA}. And a list with
-point estimates, p-values, q-values and corresponding feature names is returned.
-Below is results generated by using the {\tt MSset} exampleMSset1.
+Finally, we perform differential abundance analyais using
+{\tt SummarizedExperiment} object created in the last section. This can be done
+by using function {\tt SDA}. And a list with point estimates, p-values, q-values
+and corresponding feature names is returned. Below is results generated by using
+the {\tt SummarizedExperiment} object exampleSEset1.
 
 \begin{Schunk}
 \begin{Sinput}
-> results = SDA(exampleMSset1)
+> results = SDA(exampleSEset1)
 > head(results$gamma)
 \end{Sinput}
 \begin{Soutput}
@@ -341,15 +330,19 @@ Below is results generated by using the {\tt MSset} exampleMSset1.
   \item BLAS: \verb|/Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib|
   \item LAPACK: \verb|/Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib|
   \item Base packages: base, datasets, graphics, grDevices, methods,
-    stats, utils
-  \item Other packages: SDAMS~0.99.4
-  \item Loaded via a namespace (and not attached): Biobase~2.36.2,
-    BiocGenerics~0.22.1, colorspace~1.3-2, compiler~3.4.3,
-    ggplot2~2.2.1, grid~3.4.3, gtable~0.2.0, lazyeval~0.2.0,
-    magrittr~1.5, munsell~0.4.3, parallel~3.4.3, plyr~1.8.4,
-    qvalue~2.8.0, Rcpp~0.12.11, reshape2~1.4.2, rlang~0.1.1,
-    scales~0.4.1, splines~3.4.3, stringi~1.1.5, stringr~1.2.0,
-    tibble~1.3.3, tools~3.4.3, trust~0.1-7
+    parallel, stats, stats4, utils
+  \item Other packages: Biobase~2.36.2, BiocGenerics~0.22.1,
+    DelayedArray~0.2.7, GenomeInfoDb~1.12.3, GenomicRanges~1.28.6,
+    IRanges~2.10.5, matrixStats~0.53.1, S4Vectors~0.14.7, SDAMS~0.99.4,
+    SummarizedExperiment~1.6.5
+  \item Loaded via a namespace (and not attached): bitops~1.0-6,
+    colorspace~1.3-2, compiler~3.4.3, GenomeInfoDbData~0.99.0,
+    ggplot2~2.2.1, grid~3.4.3, gtable~0.2.0, lattice~0.20-35,
+    lazyeval~0.2.0, magrittr~1.5, Matrix~1.2-12, munsell~0.4.3,
+    plyr~1.8.4, qvalue~2.8.0, Rcpp~0.12.11, RCurl~1.95-4.10,
+    reshape2~1.4.2, rlang~0.1.1, scales~0.4.1, splines~3.4.3,
+    stringi~1.1.5, stringr~1.2.0, tibble~1.3.3, tools~3.4.3,
+    trust~0.1-7, XVector~0.16.0, zlibbioc~1.22.0
 \end{itemize}\end{Schunk}
 
 
