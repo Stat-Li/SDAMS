@@ -13,38 +13,38 @@
 \enumerate{
 \item \code{createSEFromCSV} creates SummarizedExperiment object from csv files;
 \item \code{createSEFromMatrix} creates SummarizedExperiment object from
-    separate matrices: one for feature data and the other one for group.
+    separate matrices: one for feature data and the other one for colData.
 }
 
 }
 \usage{
-createSEFromCSV(featurePath, groupPath, rownames1 = 1, rownames2 = 1,
+createSEFromCSV(featurePath, colDataPath, rownames1 = 1, rownames2 = 1,
                   header1 = TRUE, header2 = TRUE)
 
-createSEFromMatrix(feature, group)
+createSEFromMatrix(feature, colData)
 }
 
 \arguments{
   \item{featurePath}{path for feature data.}
 
-  \item{groupPath}{path for subject grouping data.}
+  \item{colDataPath}{path for colData.}
 
   \item{rownames1}{indicator for feature data with row names. If NULL, row
   numbers are automatically generated.}
 
-  \item{rownames2}{indicator for group data with row names. If NULL, row
+  \item{rownames2}{indicator for colData with row names. If NULL, row
   numbers are automatically generated.}
 
   \item{header1}{a logical value indicating whether the first row of feature is
   column names. The default value is TRUE.}
 
-  \item{header2}{a logical value indicating whether the first row of group is
-  column names. The default value is TRUE. If group input is a vector, set to
+  \item{header2}{a logical value indicating whether the first row of colData is
+  column names. The default value is TRUE. If colData input is a vector, set to
   False.}
 
   \item{feature}{a matrix with row being features and column being subjects.}
 
-  \item{group}{a one column matrix containing subject grouping information.}
+  \item{colData}{a column type data containing information about the subjects.}
 }
 
 \value{
@@ -82,6 +82,6 @@ groupInfo <- data.frame(grouping=matrix(sample(0:1, 40, replace = TRUE),
                         ncol = 1))
 rownames(groupInfo) <- colnames(featureInfo)
 
-exampleSE <- createSEFromMatrix(feature = featureInfo, group = groupInfo)
+exampleSE <- createSEFromMatrix(feature = featureInfo, colData = groupInfo)
 exampleSE
 }

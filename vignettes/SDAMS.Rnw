@@ -188,7 +188,7 @@ groupInfo <- data.frame(grouping=matrix(sample(0:1, 40, replace = TRUE),
                         ncol = 1))
 rownames(groupInfo) <- colnames(featureInfo)
 
-exampleSE2 <- createSEFromMatrix(feature = featureInfo, group = groupInfo)
+exampleSE2 <- createSEFromMatrix(feature = featureInfo, colData = groupInfo)
 exampleSE2
 head(assay(exampleSE2)[,1:10])
 head(colData(exampleSE2)$grouping)
@@ -255,10 +255,10 @@ results in the other components.
 As mentioned in the abstract, MS data is a mixture of zero intensity values
 and possibly non-normally distributed non-zero intensity values. Therefore, the
 differential abundance analysis needs to be performed to compare both the zero
-proportion and the mean of non-zero values between groups. SDA is a two-part
-model which addresses these issues that uses a logistic regression model
-to characterize the zero proportion and a semiparametric model to characterize
-non-zero values.
+proportion and the mean of non-zero values between groups and also allows
+adjustment of covariates. SDA is a two-part model which addresses these issues
+that uses a logistic regression model to characterize the zero proportion and a
+semiparametric model to characterize non-zero values.
 \subsection{A two-part semi-parametric model}
 
 The differential abundance analysis in SDAMS has the following forms.

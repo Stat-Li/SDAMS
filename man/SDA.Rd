@@ -11,13 +11,14 @@ coefficients. And likelihood ratio test is constructed for differential
 abundance analysis.
 }
 \usage{
-SDA(sumExp)
+SDA(sumExp, VOI = NULL, ...)
 }
 
 \arguments{
-  \item{sumExp}{
-An object of 'SummarizedExperiment' class.
-}
+  \item{sumExp}{An object of 'SummarizedExperiment' class.}
+  \item{VOI}{Variable of interest. Default is NULL, when there is only one
+  covariate, otherwise it must be one of the column names in colData.}
+  \item{...}{Additional arguments passed to \code{\link{qvalue}}.}
 
 }
 
