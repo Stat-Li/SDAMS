@@ -32,7 +32,7 @@ createSEFromCSV <- function(featurePath, colDataPath, rownames1 = 1,
                         check.names = FALSE)
     colData <- read.csv(colDataPath, row.names = rownames2, header = header2,
                         check.names = FALSE)
-    # colData = data.frame(grouping=as.factor(colData$grouping))
+    
     result <- createSEFromMatrix(feature = feature, colData = colData)
 
     return(result)
