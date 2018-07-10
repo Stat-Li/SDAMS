@@ -15,7 +15,7 @@ SDA <- function(sumExp, VOI = NULL, ...){
     results <- Reduce('comb', rawresult)
     qv_1part <- apply(results$X1pvalue, 2, qvalue::qvalue,...)
     qv_2part <- qvalue::qvalue(results$X2pvalue,...)
-    nparams = dim(results$pointest)[2]/2
+    nparams <- dim(results$pointest)[2]/2
     df.results <- list(gamma = results$pointest[,1:nparams],
                         beta = results$pointest[,-(1:nparams)],
                         pv_gamma = results$X1pvalue[,1],
