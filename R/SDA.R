@@ -269,5 +269,4 @@ SDA.unit <- function(featurevec, phenodata, VOI = NULL, bw = 1){
     return(list(pointest = as.numeric(results1$pointest),
                 X1pvalue = res_pv$X1pvalue, X2pvalue = res_pv$X2pvalue))
 }
-# aa=SDA.unit(featurevec = featureInfo[11,],groupInfo,VOI = 'dd')
-# aa
+
