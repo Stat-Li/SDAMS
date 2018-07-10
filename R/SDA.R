@@ -105,7 +105,7 @@ aft_model <- function(data_feature, phenodata, bw = 1){
 
 
 SDA_1cov <- function(featurevec, phenodata, VOI = NULL, bw = 1){
-    # SDA with one covariate (categorical)
+    
     dmatrix <- model.matrix(~., data = phenodata)
     dmatrixNoInt <- as.matrix(dmatrix[,-1])
     if(is.null(VOI)){
