@@ -1,0 +1,17 @@
+import("trust")
+import("qvalue")
+import("methods")
+import("SummarizedExperiment")
+
+importFrom("stats", "IQR")
+importFrom("stats", "dnorm")
+importFrom("stats", "glm")
+importFrom("stats", "model.matrix")
+importFrom("stats", "pchisq")
+importFrom("stats", "pnorm")
+importFrom("stats", "sd")
+importFrom("utils", "read.csv")
+
+export("createSEFromMatrix")
+export("createSEFromCSV")
+export("SDA")
