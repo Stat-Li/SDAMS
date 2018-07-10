@@ -2,3 +2,12 @@ VERSION 0.99.7
 ----------------------
 
 package submission.
+<<<<<<< HEAD
+=======
+
+
+VERSION 1.1.0
+----------------------
+1. allow adjustment of covariates;
+2. update 'SDA' with additional arguments passed to 'qvalue'.
+>>>>>>> 115abf4... bug fix: additional arguments passed to SDA
