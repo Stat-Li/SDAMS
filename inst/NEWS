@@ -1,10 +1,13 @@
 VERSION 0.99.7
 ----------------------
++ package submission.
 
-package submission.
 
-
-VERSION 1.1.0
+VERSION 1.1.1
 ----------------------
-1. allow adjustment of covariates;
-2. update 'SDA' with additional arguments passed to 'qvalue'.
++  allow adjustment of covariates;
++  update 'SDA' with additional arguments passed to 'qvalue'.
+
+VERSION 1.1.2
+----------------------
++ update NEWS file.
