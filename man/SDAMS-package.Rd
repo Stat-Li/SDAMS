@@ -21,8 +21,8 @@
   Li Chen <lichenuky@uky.edu>
 }
 \references{
-Yuntong Li, Teresa W.M. Fan, Andrew N. Lane, Woo-Young Kang, Susanne M. Arnold,
-Arnold J. Stromberg, Chi Wang and Li Chen: A Two-Part Semi-Parametric Model for
-Metabolomics and Proteomics Data. (Manuscript)
+Li, Y., Fan, T.W., Lane, A.N. et al. SDA: a semi-parametric differential
+abundance analysis method for metabolomics and proteomics data.
+BMC Bioinformatics 20, 501 (2019).
 }
 \keyword{package}
