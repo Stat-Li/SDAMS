@@ -18,4 +18,8 @@ VERSION 1.7.1
 
 VERSION 1.9.1
 ----------------------
-+ add example for single-cell data
++ add example for single-cell data.
+
+VERSION 1.9.2
+----------------------
++ update description for single-cell data in reference manual.

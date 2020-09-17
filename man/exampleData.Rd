@@ -8,7 +8,8 @@
 }
 \description{
 SDAMS package provides two types of example datasets: one is prostate cancer
-proteomics data and the other one is single cell RNA sequencing data.
+proteomics data from mass spectrometry and the other one is single-cell RNA 
+sequencing data.
 \enumerate{
 \item  For prostate cancer proteomics data, it is from the human urinary
 proteome database(\url{
