@@ -2,7 +2,7 @@ Package: SDAMS
 Type: Package
 Title: Differential Abundant Analysis for Metabolomics, Proteomics and 
        single-cell RNA sequencing Data
-Version: 1.9.1
+Version: 1.10.0
 Date: 2020-09-15
 Author: Yuntong Li <yuntong.li@uky.edu>, Chi Wang <chi.wang@uky.edu>, 
      Li Chen <lichenuky@uky.edu>
