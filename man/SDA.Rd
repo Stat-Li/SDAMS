@@ -2,13 +2,14 @@
 \alias{SDA}
 
 \title{
-Semi-parametric differential abuandance analysis
+Semi-parametric differential abuandance/expression analysis
 }
 \description{
-This function considers a two-part semi-parametric model for metabolomics and
-proteomics data. A kernel-smoothed method is applied to estimate the regression
+This function considers a two-part semi-parametric model for metabolomics,
+proteomics and single-cell RNA sequencing data. A kernel-smoothed method is
+applied to estimate the regression
 coefficients. And likelihood ratio test is constructed for differential
-abundance analysis.
+abundance/expression analysis.
 }
 \usage{
 SDA(sumExp, VOI = NULL, ...)
@@ -34,48 +35,74 @@ A list containing the following components:
   \item{qv_beta }{a vector of one-part q-values for \eqn{\beta_g}{beta_g} }
   \item{pv_2part }{a vector of two-part p-values for overall test }
   \item{qv_2part }{a vector of two-part q-values for overall test }
-  \item{feat.names }{a vector of feature names }
+  \item{feat.names }{a vector of feature/gene names }
 }
 
 \details{
-    The differential abundance analysis is to compare metabolomic or proteomic
-    profiles between different experimental groups, which utilizes a two-part
+    The differential abundance/expression analysis is to compare metabolomic or             proteomic profiles or gene expression between different experimental groups,
+    which utilizes a two-part
     model: a logistic regression model to characterize the zero proportion and a
     semi-parametric model to characterize non-zero values. Let
-    \eqn{Y_{ig}}{Y_ig} be the random variable representing the abundance of
-    feature \eqn{g} in subject \eqn{i}. This two-part model has the following
+    \eqn{Y_{i}}{Y_i} be the random variable and \eqn{X_{i}}{X_i} is a vector of             covariates. This two-part model has the following
     form:
 
-    \deqn{ \log(\frac{\pi_{ig}}{1-\pi_{ig}})=\gamma_{0g}+
-    \boldsymbol{\gamma}_g \boldsymbol{X}_{i} }{ log(pi_ig/(1-pi_ig))=gamma_0g +
-    gamma_g*X_i}
-    \deqn{ \log(Y_{ig})=\boldsymbol{\beta}_g \boldsymbol{X}_i +
-    \varepsilon_{ig} }{ log(Y_ig)=beta_g*X_i+ epsilon_ig }
+    \deqn{ \log(\frac{\pi_{i}}{1-\pi_{i}})=\gamma_{0}+
+    \boldsymbol{\gamma} \boldsymbol{X}_{i} }{ log(pi_i/(1-pi_i))=gamma_0 +
+    gamma*X_i}
+    \deqn{ \log(Y_{i})=\boldsymbol{\beta} \boldsymbol{X}_i +
+    \varepsilon_{i} }{ log(Y_i)=beta*X_i+ epsilon_i }
 
-    where \eqn{\pi_{ig}=Pr(Y_{ig}=0)}{pi_ig=Pr(Y_ig=0)} be the probability of
-    point mass, \eqn{\boldsymbol{X}_i=(X_{i1},X_{i2},...,X_{iQ})^T}{X_i=(X_i1,
-    X_i2,..., X_iQ)^T} is a Q-vector covariates that specifies the treatment
+    where \eqn{\pi_{i}=Pr(Y_{i}=0)}{pi_i=Pr(Y_i=0)}. The model parameters
+    \eqn{\boldsymbol{\gamma}}{gamma} quantify the covariates effects on the
+    fraction of zero values and \eqn{\gamma_0}{gamma_0} is the intercept.
+    \eqn{\boldsymbol{\beta}}{beta} are the model parameters quantifying the
+    covariates effects on the non-zero values, \eqn{\varepsilon_{i}}{epsilon_i}
+    are independent error terms with a common but completely unspecified density            function \eqn{f}{f}.
+
+    For differential abundant analysis on data from mass spectrometry,
+    \eqn{Y_{i}}{Y_i} represents the abundance of certain feature for subject
+    \eqn{i}{i}, \eqn{\pi_{i}}{pi_i} is the probability of point mass.
+    \eqn{\boldsymbol{X}_i=(X_{i1},X_{i2},...,X_{iQ})^T}{X_i=(X_i1,
+    X_i2,..., X_iQ)^T} is a Q-vector of covariates that specifies the treatment
     conditions applied to subject \eqn{i}. The corresponding Q-vector of model
-    parameters \eqn{\boldsymbol{\gamma}_g=(\gamma_{1g},\gamma_{2g},...,
-    \gamma_{Qg})^T}{gamma_g=(gamma_1g, gamma_2g,...,gamma_Qg)^T} quantify the
-    covariates effects on the fraction of zero values for feature \eqn{g} and
-    \eqn{\gamma_{0g}}{gamma_0g} is the intercept. \eqn{\boldsymbol{\beta}_g=(
-    \beta_{1g},\beta_{2g},...,\beta_{Qg})^T}{beta_g=(beta_1g, beta_2g,...,
-    beta_Qg)
-    ^T} is a Q-vector of model parameters quantifying the covariates effects on
-    the non-zero values for the feature. And \eqn{\varepsilon_{ig}}{epsilon_ig}
-    are independent error terms with a common but completely unspecified density
-    function \eqn{f_g}{f_g}.
-
-    Hypothesis testing on the effect of the \eqn{q}th covariate on the \eqn{g}th
-    feature is performed by assessing \eqn{\gamma_{qg}}{gamma_qg} and \eqn{
-    \beta_{qg}}{beta_qg}. Consider the null hypothesis \eqn{H_0}{H_0}: \eqn{
-    \gamma_{qg}}{gamma_qg} and \eqn{\beta_{qg}}{beta_qg} against alternative
+    parameters \eqn{\boldsymbol{\gamma}=(\gamma_{1},\gamma_{2},...,
+    \gamma_{Q})^T}{gamma=(gamma_1, gamma_2,...,gamma_Q)^T} and
+    \eqn{\boldsymbol{\beta}=(
+    \beta_{1},\beta_{2},...,\beta_{Q})^T}{beta=(beta_1, beta_2,...,
+    beta_Q)^T} quantify the covariates effects for certain feature. Hypothesis
+    testing on the effect of the \eqn{q}th covariate on certain
+    feature is performed by assessing \eqn{\gamma_{q}}{gamma_q} and \eqn{
+    \beta_{q}}{beta_q}. Consider the null hypothesis \eqn{H_0}{H_0}: \eqn{
+    \gamma_{q}=0}{gamma_q=0} and \eqn{\beta_{q}=0}{beta_q=0} against alternative
     hypothesis \eqn{H_1}{H_1}: at least one of the two parameters is non-zero.
-    The p-value is calculated based on a chi-square distribution with 2 degrees
-    of freedom. To adjust for multiple comparisons across features, the false
+    We also consider the hypotheses for testing \eqn{\gamma_{q}=0}{gamma_q=0} and
+    \eqn{\beta_{q}=0}{beta_q=0} individually.
+
+
+    For differential expression analysis on single-cell RNA sequencing data,
+    \eqn{Y_{i}}{Y_i} represents represents the expression (TPM value) of certain gene in     \eqn{i}{i}th cell, \eqn{\pi_{i}}{pi_i} is the drop-out probability.
+    \eqn{\boldsymbol{X}_i=(Z_{i}, \boldsymbol{W}_i)^T}{X_i=(Z_i,
+    W_i)^T} is a vector of covariates with \eqn{Z_i}{Z_i} being a binary
+    indicator of the cell population under comparison and
+    \eqn{\boldsymbol{W}_i}{W_i} being a vector of other covariates, e.g. cell
+    size, and \eqn{\boldsymbol{\gamma}=(\gamma_{Z},\boldsymbol{\gamma}_W)}{gamma            =(gamma_Z, gamma_W)} and
+    \eqn{\boldsymbol{\beta}=(\beta_{Z},\boldsymbol{\beta}_W)}{beta=
+    (beta_Z, beta_W)} are model parameters. Hypothesis
+    testing on the effect of different cell subpopulations on certain
+    gene is performed by assessing \eqn{\gamma_{Z}}{gamma_Z} and \eqn{
+    \beta_{Z}}{beta_Z}. For
+    each gene, the likelihood ratio test is performed on the null hypothesis
+    \eqn{H_0}{H_0}: \eqn{
+    \gamma_{Z}=0}{gamma_Z=0} and \eqn{\beta_{Z}=0}{beta_Z=0} against alternative
+    hypothesis \eqn{H_1}{H_1}: at least one of the two parameters is non-zero.
+    We also consider the hypotheses for testing \eqn{\gamma_{Z}=0}{gamma_Z=0} and
+    \eqn{\beta_{Z}=0}{beta_Z=0} individually.
+
+    The p-value is calculated based on an asympotic chi-squared distribution. To
+    adjust for multiple comparisons across features, the false
     discovery discovery rate (FDR) q-value is calculated based on the
     \link[qvalue]{qvalue} function in R/Bioconductor.
+
 }
 
 \author{

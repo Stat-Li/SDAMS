@@ -3,13 +3,13 @@
 \alias{SDAMS-package}
 
 \title{
- SDAMS package for differential abundance analysis of Metabolomics, Proteomics 
- and single-cell RNA sequencing data
+ SDAMS package for differential abundance/expression analysis of Metabolomics,
+ Proteomics and single-cell RNA sequencing data
 }
 \description{
-  SDAMS is an R package for differential abundance analysis of metabolomics and
-  proteomics data from mass spectrometry and single-cell RNA sequencing data, 
-  and the main function for differential abundance analysis
+  SDAMS is an R package for differential abundance/expression analysis of
+  metabolomics, proteomics and single-cell RNA sequencing data, and the main
+  function for differential abundance/expression analysis
   is \code{\link{SDA}}. See the examples at \code{\link{SDA}} for
   basic analysis steps. SDAMS considers a two-part model, a logistic regression
   for the zero proportion and a semi-parametric log-linear model for the
