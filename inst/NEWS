@@ -16,10 +16,18 @@ VERSION 1.7.1
 ----------------------
 + add reference.
 
-VERSION 1.8.1
+VERSION 1.9.1
 ----------------------
-+ add example for single-cell data
++ add example for single-cell data.
+
+VERSION 1.9.2
+----------------------
++ update description for single-cell data in reference manual.
 
 VERSION 1.11.1
 ----------------------
 + update vignette and reference manual with single-cell RNA sequencing data
+
+VERSION 1.11.2
+----------------------
++ re-upload files under Version 1.11.1

@@ -44,7 +44,7 @@ Lexington, KY;}\\
 \begin{abstract}
 This vignette introduces the use of the Bioconductor package
 {\tt SDAMS}, which is designed for differential abundance analysis for
-metabolomics and proteomics data from mass spectrometry and differential
+metabolomics and proteomics data from mass spectrometry or differential
 expression analysis for single-cell RNA sequencing data. These data may contain
 a large fraction of zero values and non-zero part may not be normally
 distributed. {\tt SDAMS} considers a two-part semi-parametric model, a logistic
