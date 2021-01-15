@@ -2,6 +2,7 @@
 %\VignettePackage{SDAMS}
 %\VignetteKeyword{Semi-parametric Differential Adundance Analysis}
 
+
 \documentclass[12pt]{article}
 
 \usepackage{float}
