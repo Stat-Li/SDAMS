@@ -26,8 +26,12 @@ VERSION 1.9.2
 
 VERSION 1.11.1
 ----------------------
-+ update vignette and reference manual with single-cell RNA sequencing data
++ update reference manual with single-cell RNA sequencing data
 
 VERSION 1.11.2
 ----------------------
 + re-upload files under Version 1.11.1
+
+VERSION 1.11.3
+----------------------
++ update vignette with SC RNA sequencing data
