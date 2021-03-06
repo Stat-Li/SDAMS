@@ -2,7 +2,6 @@
 %\VignettePackage{SDAMS}
 %\VignetteKeyword{Semi-parametric Differential Adundance Analysis}
 
-
 \documentclass[12pt]{article}
 
 \usepackage{float}
@@ -25,9 +24,8 @@
 should be addressed}, Li Chen$^{2,3}$\footnote{to whom correspondence
 should be addressed}\\[1em]
 \small{$^{1}$Department of Statistics , University of Kentucky,Lexington, KY;}\\
-\small{$^{2}$Markey Cancer Center, University of Kentucky, Lexington, KY ;}\\
-\small{$^{3}$Department of Biostatistics, University of Kentucky,
-Lexington, KY;}\\
+\small{$^{2}$Markey Cancer Center, University of Kentucky, Lexington, KY;}\\
+\small{$^{3}$Division of Cancer Biostatistics, Department of Internal Medicine;}\\
 \small{\texttt{yuntong.li@uky.edu}}\\
 \small{\texttt{chi.wang@uky.edu}}\\
 \small{\texttt{lichenuky@uky.edu}}}
@@ -47,12 +45,12 @@ This vignette introduces the use of the Bioconductor package
 {\tt SDAMS}, which is designed for differential abundance analysis for
 metabolomics and proteomics data from mass spectrometry and differential
 expression analysis for single-cell RNA sequencing data. These data may contain
-a large fraction of zero values and non-zero part may not be normally
+a large fraction of zero values and the non-zero part may not be normally
 distributed. {\tt SDAMS} considers a two-part semi-parametric model, a logistic
 regression for the zero proportion and a semi-parametric log-linear model for
 the non-zero values. A kernel-smoothed likelihood method is proposed to estimate
 regression coefficients in the two-part model and a likelihood ratio test is
-constructed for differential abundant analysis.
+constructed for differential abundant/expression analysis.
 
 \end{abstract}
 
@@ -71,8 +69,8 @@ Li, Y., Fan, T.W., Lane, A.N. et al. SDA: a semi-parametric differential
 abundance analysis method for metabolomics and proteomics data.
 BMC Bioinformatics 20, 501 (2019).\\
 Yuntong Li, Chi Wang and Li Chen:
-SDAMS for differential expression analysis of single-cell RNA sequencing data.
-(Manuscript)
+SDAMS: an R Package for differential expression analysis of single-cell RNA
+sequencing data (Manuscript).
 
 \section{Quick Start}
 This section show the most basic {\tt SDAMS} work flow for a differential
@@ -105,6 +103,20 @@ matrix in the assay slot. Each row in this matrix represents a proteomic
 feature and each column represents a subject. See Reference~
 \cite{siwy2011human} for detailed information regarding this dataset.
 
+<<quick start , eval=FALSE >>=
+data("exampleSingleCell")
+results_SC <- SDA(exampleSingleCell)
+@
+
+The {\tt SDAMS} package also provides an example for single-cell RNA sequencing
+data in a {\tt SummarizedExperiment} class object {\tt exampleSingleCell}.
+There are 92 single
+cells (48 mouse embryonic stem (ES) cells and 44 mouse embryonic fibroblasts
+(MEF) cells) that were analyzed. This example data in the form of TPM
+(transcripts per kilobase million) values contains
+10\% of genes which are randomly sampled from the original dataset.
+See Reference~\cite{islam2011characterization} for detailed information
+regarding this dataset.
 
 
 \section{Data Input}
@@ -184,7 +196,9 @@ head(colData(exampleSE1)$grouping)
 \subsection{Create SummarizedExperiment object from seperate matrix}
 If the two datasets have already been cleaned and loaded into R as matrices,
 then we can use {\tt createSEFromMatrix} to create a
-{\tt SummarizedExperiment} object.
+{\tt SummarizedExperiment} object. Note that {\tt groupInfo} is the design
+matrix. The first colomn of this design matrix is the cell subpopulation, and
+the following columns could be additional covariates.
 
 <<MatrixInput>>=
 set.seed(100)
@@ -214,9 +228,9 @@ using the {\tt SummarizedExperiment} object exampleSE1.
 
 <<resultsForGamma>>=
 results <- SDA(exampleSE1)
-head(results$gamma)
-head(results$pv_gamma)
-head(results$qv_gamma)
+head(results$gamma[,1])
+head(results$pv_gamma[,1])
+head(results$qv_gamma[,1])
 @
 In this example , there is only one group covariate applied to each subject.
 Here $\textbf{X}_i$ is one dimension. The covariate effect on the fraction of
@@ -230,9 +244,9 @@ nominal level. We also provide a FDR adjustment method
 Those results for $\gamma$ are stored in {\tt qv\_gamma}.
 
 <<resultsForBeta>>=
-head(results$beta)
-head(results$pv_beta)
-head(results$qv_beta)
+head(results$beta[,1])
+head(results$pv_beta[,1])
+head(results$qv_beta[,1])
 @
 The model parameter $\beta$ is the log fold change in the non-zero abundance
 comparing different values of the single group covariate for certain feature.
@@ -242,8 +256,8 @@ p-values (q-values) for parameter $\beta$, and they are stored in
 {\tt pv\_beta} and {\tt qv\_beta} respectively.
 
 <<resultsFor2part>>=
-head(results$pv_2part)
-head(results$qv_2part)
+head(results$pv_2part[,1])
+head(results$qv_2part[,1])
 @
 
 Hypothesis testing on overall effect of group covariate on certain feature is
@@ -261,54 +275,52 @@ results in the other components.
 
 \subsection{Single-cell RNA sequencing example data}
 SDAMS can also perform differential expression analysis for single-cell
-RNA sequencing data with a large number of cells which are not expressed. The
-example data {\tt exampleSingleCell} in this package is a
-{\tt SummarizedExperiment} object which can be loaded and analyzed.
+RNA sequencing data.
 % <<loadData, eval= FALSE>>=
 % data(exampleSingleCell)
 % @
 
 In this section, we will use the example data generated in Section 3.2. This toy
-data set has 200 genes and 40 cells. And there is only one covariate i.e.
-a binary indicator of the cell subpopulation in this example. Additional
-covariates can be added, but make sure covariate for cell subpopulation is
-listed in the first column of this covariate matrix.
+data set has 200 genes and 40 cells. The first column of the design matrix is
+the cell subpopulation, and additional covariates can be added into the design
+matrix.
 We are interested in identifying genes that are differentially expressed in two
 different cell subpopulations, which is quantified by $\gamma_{Z}$ and
-$\beta_{Z}$. The $\gamma_{Z}$ is the log odds ratio comparing proportion of
-drop-outs, and $\beta_{Z}$ is the log fold change comparing the mean gene
-expression between the two cell subpopulations.
+$\beta_{Z}$. The $\gamma_{Z}$ is the log odds ratio comparing rate of
+expression, and $\beta_{Z}$ is the log fold change comparing the mean gene
+expression of the expressed cells between the two cell subpopulations.
 
 <<AnalysisAndResults>>=
 results_SC <- SDA(exampleSE2)
-head(results_SC$pv_gamma)
-head(results_SC$qv_gamma)
-head(results_SC$pv_beta)
-head(results_SC$qv_beta)
-head(results_SC$pv_2part)
-head(results_SC$qv_2part)
+head(results_SC$pv_gamma[,1])
+head(results_SC$qv_gamma[,1])
+head(results_SC$pv_beta[,1])
+head(results_SC$qv_beta[,1])
+head(results_SC$pv_2part[,1])
+head(results_SC$qv_2part[,1])
 head(results_SC$feat.names)
 @
 Three types of hypotheses can be tested through function
-{\tt SDA}: $H_0^1: \gamma_{Z}=0$, $H_0^2: \beta_{Z}=0$, and $H_0^3:
+{\tt SDA}: $H_0^1: \beta_{Z}=0$, $H_0^2: \gamma_{Z}=0$, and $H_0^3:
 \gamma_{Z}=0 \textrm{ and } \beta_{Z} = 0$. Likelihood ratio test is conducted
 for each test and p-value is returned by {\tt SDA} for each single gene. The
 corresponding q-values are also calculated to address multiple comparison
 correction.
 For Hypothesis $H_0^1$, the p-value and corresponding q-value for each gene are
+returned in {\tt pv\_beta} and {\tt qv\_beta}.
+For Hypothesis $H_0^2$, the p-value and corresponding q-value for each gene are
 returned in {\tt pv\_gamma} and {\tt qv\_gamma}. For example, the p-value for
 testing the covariate effect on comparing the proportion of drop-outs for Gene 1
 is 0.496,
 which is not significant under 0.05 level. The corresponding q-value is 0.955.
-For Hypothesis $H_0^2$, the p-value and corresponding q-value for each gene are
-returned in {\tt pv\_beta} and {\tt qv\_beta}. For testing either the
-drop-outs proportion or mean expression is different, $H_0^3$, the p-value and
+For testing whether there is difference in either the rate of expression or mean expression for the expressed cells, $H_0^3$, the p-value and
 corresponding q-value for each gene are returned in {\tt pv\_2part} and
 {\tt qv\_2part}.
 
 \section{Theory for SDAMS}\label{theory}
 
-As mentioned in the abstract, MS data or SC RNA sequencing data maybe a mixture
+As mentioned in the abstract, metabolomics and proteomics data from mass
+spectrometry or single-cell RNA sequencing data maybe a mixture
 of zero intensity values
 and possibly non-normally distributed non-zero intensity values. Therefore, the
 differential abundance/expression analysis needs to be performed to compare both
@@ -328,7 +340,7 @@ For continuous non-zero part:
 \varepsilon_{i}, \]
 
 where $Y_{i}$ $(i=1, 2, ..., N)$ is a random variable and $\pi_{i}=Pr(Y_{i}=0)$.
-$\boldsymbol{X}_i$ is a vrctor of covariates. The corresponding model parameters
+$\boldsymbol{X}_i$ is a vector of covariates. The corresponding model parameters
 $\boldsymbol{\gamma}$ quantify the covariates effects on the fraction of zero
 values and $\gamma_{0}$ is the intercept. $\boldsymbol{\beta}$ are the model
 parameters quantifying the covariates effects on the non-zero values, and
@@ -362,19 +374,19 @@ discovery rate (FDR) q-value is calculated based on the {\tt qvalue} function in
 \subsection{Identification of differentially expressed genes based on
             single-cell RNA sequencing data}
 In this case, $Y_{i}$ represents the expression (TPM value) of certain
-gene in the $i$th cell, $\pi_{i}=Pr(Y_{i}=0)$ is the drop-out probability.
+gene in the $i$th cell, $1-\pi_{i}=Pr(Y_{i}>0)$ is the rate of expression.
 $\boldsymbol{X}_i=(Z_{i},\boldsymbol{W}_i)^T$ is a vector of covariates with
 $Z_{i}$ being a binary indicator of the cell population under comparison and
-$\boldsymbol{W}_i$ being a vector of other covariates, e.g. cell size, and
+$\boldsymbol{W}_i$ being a vector of other covariates, e.g. batch and cellular
+detection rate, and
 $\boldsymbol{\gamma}=(\gamma_Z, \boldsymbol{\gamma}_W)$ and
 $\boldsymbol{\beta}=(\beta_Z, \boldsymbol{\beta}_W)$ are model parameters.
 
 We are interested in identifying genes that are differentially expressed in two
 different cell subpopulations, as quantified by $\gamma_Z$ and $\beta_Z$.
-For each gene, the likelihood ratio test is performed on the null hypothesis
-$H_0:$ $\gamma_{Z}=0$ and $\beta_{Z}=0$ against alternative
-hypothesis $H_1:$ at least one of the two parameters is non-zero. We also
-consider the hypotheses for testing $\gamma_{Z}=0$ and $\beta_{Z}=0$ separately.
+For each gene, three null hypotheses, i.e. $\beta_Z=0$, $\gamma_Z=0$, and
+$\beta_Z =0 \textrm{ and } \gamma_Z=0$, are examined based on likelihood ratio
+tests.
 Multiple comparison correction is addressed by calculating the false discovery
 discovery rate (q-values) (See Reference~\cite{storey2003statistical} for
 details).
