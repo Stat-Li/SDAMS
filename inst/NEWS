@@ -35,3 +35,7 @@ VERSION 1.11.2
 VERSION 1.11.4
 ----------------------
 + update vignette with SC RNA sequencing data
+
+VERSION 1.11.5
+----------------------
++ return beta and gamma as matrix

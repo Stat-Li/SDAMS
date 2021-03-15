@@ -25,16 +25,16 @@ SDA(sumExp, VOI = NULL, ...)
 
 \value{
 A list containing the following components:
-  \item{gamma }{a vector of point estimators for \eqn{\gamma_g}{gamma_g} in the
+  \item{gamma }{a matrix of point estimators for \eqn{\gamma_g}{gamma_g} in the
   logistic model (binary part) }
-  \item{beta }{a vector of point estimators for \eqn{\beta_g}{beta_g} in the
+  \item{beta }{a matrix of point estimators for \eqn{\beta_g}{beta_g} in the
   semi-parametric model (non-zero part) }
-  \item{pv_gamma }{a vector of one-part p-values for \eqn{\gamma_g}{gamma_g} }
-  \item{pv_beta }{a vector of one-part p-values for \eqn{\beta_g}{beta_g} }
-  \item{qv_gamma }{a vector of one-part q-values for \eqn{\gamma_g}{gamma_g} }
-  \item{qv_beta }{a vector of one-part q-values for \eqn{\beta_g}{beta_g} }
-  \item{pv_2part }{a vector of two-part p-values for overall test }
-  \item{qv_2part }{a vector of two-part q-values for overall test }
+  \item{pv_gamma }{a matrix of one-part p-values for \eqn{\gamma_g}{gamma_g} }
+  \item{pv_beta }{a matrix of one-part p-values for \eqn{\beta_g}{beta_g} }
+  \item{qv_gamma }{a matrix of one-part q-values for \eqn{\gamma_g}{gamma_g} }
+  \item{qv_beta }{a matrix of one-part q-values for \eqn{\beta_g}{beta_g} }
+  \item{pv_2part }{a matrix of two-part p-values for overall test }
+  \item{qv_2part }{a matrix of two-part q-values for overall test }
   \item{feat.names }{a vector of feature/gene names }
 }
 
