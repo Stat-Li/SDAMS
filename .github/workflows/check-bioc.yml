@@ -89,7 +89,7 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
 
       - name: Install tinytex
-        uses: r-lib/actions/setup-tinytex@master
+        uses: r-lib/actions/setup-tinytex@v2
 
       ## pandoc is already included in the Bioconductor docker images
       - name: Setup pandoc from r-lib
