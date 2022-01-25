@@ -66,10 +66,6 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-
-      - name: Install tinytex
-        uses: r-lib/actions/setup-tinytex@master
-
       ## Set the R library to the directory matching the
       ## R packages cache step further below when running on Docker (Linux).
       - name: Set R Library home on Linux
@@ -91,6 +87,9 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
+
+      - name: Install tinytex
+        uses: r-lib/actions/setup-tinytex@master
 
       ## pandoc is already included in the Bioconductor docker images
       - name: Setup pandoc from r-lib
