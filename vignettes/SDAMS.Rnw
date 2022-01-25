@@ -24,9 +24,8 @@
 should be addressed}, Li Chen$^{2,3}$\footnote{to whom correspondence
 should be addressed}\\[1em]
 \small{$^{1}$Department of Statistics , University of Kentucky,Lexington, KY;}\\
-\small{$^{2}$Markey Cancer Center, University of Kentucky, Lexington, KY ;}\\
-\small{$^{3}$Department of Biostatistics, University of Kentucky,
-Lexington, KY;}\\
+\small{$^{2}$Markey Cancer Center, University of Kentucky, Lexington, KY;}\\
+\small{$^{3}$Division of Cancer Biostatistics, Department of Internal Medicine;}\\
 \small{\texttt{yuntong.li@uky.edu}}\\
 \small{\texttt{chi.wang@uky.edu}}\\
 \small{\texttt{lichenuky@uky.edu}}}
@@ -44,13 +43,14 @@ Lexington, KY;}\\
 \begin{abstract}
 This vignette introduces the use of the Bioconductor package
 {\tt SDAMS}, which is designed for differential abundance analysis for
-metabolomics and proteomics data from mass spectrometry. These data may contain
-a large fraction of zero values and non-zero part may not be normally
+metabolomics and proteomics data from mass spectrometry and differential
+expression analysis for single-cell RNA sequencing data. These data may contain
+a large fraction of zero values and the non-zero part may not be normally
 distributed. {\tt SDAMS} considers a two-part semi-parametric model, a logistic
 regression for the zero proportion and a semi-parametric log-linear model for
 the non-zero values. A kernel-smoothed likelihood method is proposed to estimate
 regression coefficients in the two-part model and a likelihood ratio test is
-constructed for differential abundant analysis.
+constructed for differential abundant/expression analysis.
 
 \end{abstract}
 
@@ -65,20 +65,25 @@ constructed for differential abundant analysis.
 \section{Citation}
 The package {\tt SDAMS} implements statistical methods from the following
 publication. If you use {\tt SDAMS} in the published research, please cite: \\
-Yuntong Li, Teresa W.M. Fan, Andrew N. Lane, Woo-Young Kang, Susanne M. Arnold,
-Arnold J. Stromberg, Chi Wang and Li Chen: A Two-Part Semi-Parametric Model for
-Metabolomics and Proteomics Data. (Manuscript)
+Li, Y., Fan, T.W., Lane, A.N. et al. SDA: a semi-parametric differential
+abundance analysis method for metabolomics and proteomics data.
+BMC Bioinformatics 20, 501 (2019).\\
+Yuntong Li, Chi Wang and Li Chen:
+SDAMS: an R Package for differential expression analysis of single-cell RNA
+sequencing data (Manuscript).
 
 \section{Quick Start}
 This section show the most basic {\tt SDAMS} work flow for a differential
-abundance analysis for metabolomics and proteomics data from mass spectrometry:
+abundance analysis for metabolomics and proteomics data from mass spectrometry
+or differential expression analysis for single-cell RNA sequencing data:
 \begin{enumerate}
 \item Create a {\tt SummarizedExperiment} object using function
       {\tt createSEFromMatrix} or {\tt createSEFromCSV}.
       In this section we use an example {\tt SummarizedExperiment} object
       directly, which is an object of {\tt SummarizedExperiment} class named
       {\tt exampleSumExp} contained in this package.
-\item Perform a differential abundance analysis using {\tt SDA}.
+\item Perform a differential abundance analysis or differential expression
+      analysis using {\tt SDA}.
 \end{enumerate}
 
 
@@ -98,6 +103,20 @@ matrix in the assay slot. Each row in this matrix represents a proteomic
 feature and each column represents a subject. See Reference~
 \cite{siwy2011human} for detailed information regarding this dataset.
 
+<<quick start , eval=FALSE >>=
+data("exampleSingleCell")
+results_SC <- SDA(exampleSingleCell)
+@
+
+The {\tt SDAMS} package also provides an example for single-cell RNA sequencing
+data in a {\tt SummarizedExperiment} class object {\tt exampleSingleCell}.
+There are 92 single
+cells (48 mouse embryonic stem (ES) cells and 44 mouse embryonic fibroblasts
+(MEF) cells) that were analyzed. This example data in the form of TPM
+(transcripts per kilobase million) values contains
+10\% of genes which are randomly sampled from the original dataset.
+See Reference~\cite{islam2011characterization} for detailed information
+regarding this dataset.
 
 
 \section{Data Input}
@@ -107,7 +126,8 @@ feature and each column represents a subject. See Reference~
 The proteomics or metabolomics data is stored as a matrix with each
 row being a feature and each column corresponding to a subject. All data in this
 matrix are non-negative. Another information required is the phenotype
-covariates. Here we focus on the binary grouping information, such as numeric 1
+covariates. Here we focus on the binary grouping information, for example,
+numeric 1
 for control group and 0 for case group. But it can also be characters, such as
 "healthy" and "disease". To utilize {\tt SDAMS} package, we should have two
 separate csv files (for example 'feature.csv' and 'group.csv') as inputs for
@@ -174,16 +194,18 @@ head(colData(exampleSE1)$grouping)
 
 
 \subsection{Create SummarizedExperiment object from seperate matrix}
-If the two datasets have been already claeaned and loaded into R as matrices,
+If the two datasets have already been cleaned and loaded into R as matrices,
 then we can use {\tt createSEFromMatrix} to create a
-{\tt SummarizedExperiment} object.
+{\tt SummarizedExperiment} object. Note that {\tt groupInfo} is the design
+matrix. The first colomn of this design matrix is the cell subpopulation, and
+the following columns could be additional covariates.
 
 <<MatrixInput>>=
 set.seed(100)
-featureInfo <- matrix(runif(800, -2, 5), ncol = 40)
+featureInfo <- matrix(runif(8000, -2, 5), ncol = 40)
 featureInfo[featureInfo<0] <- 0
-rownames(featureInfo) <- paste("feature", 1:20, sep = '')
-colnames(featureInfo) <- paste('subject', 1:40, sep = '')
+rownames(featureInfo) <- paste("gene", 1:200, sep = '')
+colnames(featureInfo) <- paste('cell', 1:40, sep = '')
 groupInfo <- data.frame(grouping=matrix(sample(0:1, 40, replace = TRUE),
                         ncol = 1))
 rownames(groupInfo) <- colnames(featureInfo)
@@ -196,105 +218,178 @@ head(colData(exampleSE2)$grouping)
 @
 
 \section{Data Analysis}
-
+\subsection{Proteomics example data}
 Finally, we perform differential abundance analyais using
-{\tt SummarizedExperiment} object created in the last section. This can be done
+{\tt SummarizedExperiment} object created in previous section. This can be done
 by using function {\tt SDA}. The theory behind {\tt SDA} can be reached at
 section \ref{theory}. A list with point estimates, p-values, q-values
-and corresponding feature names is returned. Below is the results generated by
+and corresponding feature names is returned. Below are the results generated by
 using the {\tt SummarizedExperiment} object exampleSE1.
 
 <<resultsForGamma>>=
 results <- SDA(exampleSE1)
-head(results$gamma)
-head(results$pv_gamma)
-head(results$qv_gamma)
+head(results$gamma[,1])
+head(results$pv_gamma[,1])
+head(results$qv_gamma[,1])
 @
 In this example , there is only one group covariate applied to each subject.
 Here $\textbf{X}_i$ is one dimension. The covariate effect on the fraction of
-zero values for feature $g$ is $\gamma_g$, which is estimated to be 0.11 for
+zero values for certain feature is $\gamma$, which is estimated to be 0.11 for
 the first feature, and 0.86 for the second feature, etc. The
-corresponding hypothesis is $H_0$: $\gamma_g=0$ vs. $H_1$: $\gamma_g \ne 0$. The
+corresponding hypothesis is $H_0$: $\gamma=0$ vs. $H_1$: $\gamma \ne 0$. The
 p-values calculated from likelihood ratio test are returned in {\tt pv\_gamma}.
 Users can determine their own significance level to make inference, such as 0.05
 nominal level. We also provide a FDR adjustment method
 \cite{storey2003statistical} used in {\tt SDA} for multiple comparison issues.
-Those results for $\gamma_g$ are stored in {\tt qv\_gamma}.
+Those results for $\gamma$ are stored in {\tt qv\_gamma}.
 
 <<resultsForBeta>>=
-head(results$beta)
-head(results$pv_beta)
-head(results$qv_beta)
+head(results$beta[,1])
+head(results$pv_beta[,1])
+head(results$qv_beta[,1])
 @
-The model parameter $\beta_g$ is the log fold change in the non-zero abundance
-comparing different values of the single group covariate for feature $g$. The
-corresponding two-sided hypothesis is $H_0$: $\beta_g=0$ vs. $H_1$:
-$\beta_g \ne 0$. Again, {\tt SDA} will return p-values and adjusted
-p-values(q-values) for parameter $\beta_g$, and they are stored in
+The model parameter $\beta$ is the log fold change in the non-zero abundance
+comparing different values of the single group covariate for certain feature.
+The corresponding two-sided hypothesis is $H_0$: $\beta=0$ vs. $H_1$:
+$\beta \ne 0$. Again, {\tt SDA} will return p-values and adjusted
+p-values (q-values) for parameter $\beta$, and they are stored in
 {\tt pv\_beta} and {\tt qv\_beta} respectively.
 
 <<resultsFor2part>>=
-head(results$pv_2part)
-head(results$qv_2part)
+head(results$pv_2part[,1])
+head(results$qv_2part[,1])
 @
 
-Hypothesis testing on overall effect of group covariate on the $g$th feature is
-performed by assessing $\gamma_{g}$ and $\beta_{g}$. The null hypothesis $H_0:$
-$\gamma_{g}=0$ and $\beta_{g}=0$ against alternative hypothesis $H_1:$ at least
+Hypothesis testing on overall effect of group covariate on certain feature is
+performed by assessing $\gamma$ and $\beta$. The null hypothesis $H_0:$
+$\gamma=0$ and $\beta=0$ against alternative hypothesis $H_1:$ at least
 one of the two parameters is non-zero. The p-values are calculated based on
 chi-square distribution with 2 degrees of freedom. And the corresponding
-q-values are calculated using the same procedure as in one-part model.
+q-values are calculated using the same procedure as in one-part test.
 
 <<outputForFeatureName>>=
 head(results$feat.names)
 @
 A vector of feature names is returned for convenience which corresponds to the
 results in the other components.
+
+\subsection{Single-cell RNA sequencing example data}
+SDAMS can also perform differential expression analysis for single-cell
+RNA sequencing data.
+% <<loadData, eval= FALSE>>=
+% data(exampleSingleCell)
+% @
+
+In this section, we will use the example data generated in Section 3.2. This toy
+data set has 200 genes and 40 cells. The first column of the design matrix is
+the cell subpopulation, and additional covariates can be added into the design
+matrix.
+We are interested in identifying genes that are differentially expressed in two
+different cell subpopulations, which is quantified by $\gamma_{Z}$ and
+$\beta_{Z}$. The $\gamma_{Z}$ is the log odds ratio comparing rate of
+expression, and $\beta_{Z}$ is the log fold change comparing the mean gene
+expression of the expressed cells between the two cell subpopulations.
+
+<<AnalysisAndResults>>=
+results_SC <- SDA(exampleSE2)
+head(results_SC$pv_gamma[,1])
+head(results_SC$qv_gamma[,1])
+head(results_SC$pv_beta[,1])
+head(results_SC$qv_beta[,1])
+head(results_SC$pv_2part[,1])
+head(results_SC$qv_2part[,1])
+head(results_SC$feat.names)
+@
+Three types of hypotheses can be tested through function
+{\tt SDA}: $H_0^1: \beta_{Z}=0$, $H_0^2: \gamma_{Z}=0$, and $H_0^3:
+\gamma_{Z}=0 \textrm{ and } \beta_{Z} = 0$. Likelihood ratio test is conducted
+for each test and p-value is returned by {\tt SDA} for each single gene. The
+corresponding q-values are also calculated to address multiple comparison
+correction.
+For Hypothesis $H_0^1$, the p-value and corresponding q-value for each gene are
+returned in {\tt pv\_beta} and {\tt qv\_beta}.
+For Hypothesis $H_0^2$, the p-value and corresponding q-value for each gene are
+returned in {\tt pv\_gamma} and {\tt qv\_gamma}. For example, the p-value for
+testing the covariate effect on comparing the proportion of drop-outs for Gene 1
+is 0.496,
+which is not significant under 0.05 level. The corresponding q-value is 0.955.
+For testing whether there is difference in either the rate of expression or mean expression for the expressed cells, $H_0^3$, the p-value and
+corresponding q-value for each gene are returned in {\tt pv\_2part} and
+{\tt qv\_2part}.
+
 \section{Theory for SDAMS}\label{theory}
 
-As mentioned in the abstract, MS data is a mixture of zero intensity values
+As mentioned in the abstract, metabolomics and proteomics data from mass
+spectrometry or single-cell RNA sequencing data maybe a mixture
+of zero intensity values
 and possibly non-normally distributed non-zero intensity values. Therefore, the
-differential abundance analysis needs to be performed to compare both the zero
+differential abundance/expression analysis needs to be performed to compare both
+the zero
 proportion and the mean of non-zero values between groups and also allows
 adjustment of covariates. SDA is a two-part model which addresses these issues
 that uses a logistic regression model to characterize the zero proportion and a
 semiparametric model to characterize non-zero values.
 \subsection{A two-part semi-parametric model}
 
-The differential abundance analysis in SDAMS has the following forms.
+The differential abundance/expression analysis in SDAMS has the following forms.
 For binary part:
-\[\mathrm{log}(\frac{\pi_{ig}}{1-\pi_{ig}})=\gamma_{0g}+\boldsymbol{\gamma}_g
+\[\mathrm{log}(\frac{\pi_{i}}{1-\pi_{i}})=\gamma_{0}+\boldsymbol{\gamma}
 \boldsymbol{X}_{i} , \]
 For continuous non-zero part:
-\[\mathrm{log}(Y_{ig})=\boldsymbol{\beta}_g \boldsymbol{X}_i +
-\varepsilon_{ig}, \]
+\[\mathrm{log}(Y_{i})=\boldsymbol{\beta} \boldsymbol{X}_i +
+\varepsilon_{i}, \]
 
-where $Y_{ig}$ is the random variable representing the abundance of feature $g$
-in subject $i$, $\pi_{ig}=Pr(Y_{ig}=0)$ is the probability of point mass.
+where $Y_{i}$ $(i=1, 2, ..., N)$ is a random variable and $\pi_{i}=Pr(Y_{i}=0)$.
+$\boldsymbol{X}_i$ is a vector of covariates. The corresponding model parameters
+$\boldsymbol{\gamma}$ quantify the covariates effects on the fraction of zero
+values and $\gamma_{0}$ is the intercept. $\boldsymbol{\beta}$ are the model
+parameters quantifying the covariates effects on the non-zero values, and
+$\varepsilon_{i}$ $(i=1,2,..., N)$ are independent error terms with a common but completely unspecified density function $f$. Importantly, we do not impose any
+distributional assumption on $f$. Without assuming a specific parametric
+distribution for $\varepsilon_{i}$, this model is much more flexible to
+characterize data with unknown and possibly non-normal distribution. We replace
+$f$ by its kernel density estimator in the likelihood function. The maximum
+likelihood estimator is obtained through a trust region maximization algorithm.
+
+\subsection{Identification of differentially abundant features based on data
+            from mass spectrometry}
+In this case, $Y_{i}$ represents the abundance of certain feature for
+subject $i$, $\pi_{i}=Pr(Y_{i}=0)$ is the probability of point mass.
 $\boldsymbol{X}_i=(X_{i1},X_{i2},...,X_{iQ})^T$ is a $Q$-vector covariates that
 specifies the treatment conditions applied to subject $i$. The corresponding
-$Q$-vector of model parameters $\boldsymbol{\gamma}_g=(\gamma_{1g},\gamma_{2g},
-...,\gamma_{Qg})^T$ quantify the covariates effects on the fraction of zero
-values for feature $g$ and $\gamma_{0g}$ is the intercept.
-$\boldsymbol{\beta}_g=(\beta_{1g},\beta_{2g},...,\beta_{Qg})$ is a
-$Q$-vector of model parameters quantifying the covariates effects on the
-non-zero values for the feature, and $\varepsilon_{ig}$'s $(i=1,2,..n)$ are
-independent error terms with a common but completely unspecified density
-function $f_g$. Importantly, we do not impose any distributional assumption on
-$f_g$. Without assuming a specific parametric distribution for
-$\varepsilon_{ig}$, this model is much more flexible to characterize data with
-unknown and possibly non-normal distribution.
+$Q$-vector of model parameters $\boldsymbol{\gamma}=(\gamma_{1},\gamma_{2},
+...,\gamma_{Q})^T$ and $\boldsymbol{\beta}=(\beta_{1},\beta_{2},...,\beta_{Q})$
+quantify the covariates effects for certain feature.
 
-\subsection{Identification of differentially abundant features}
-We replace $f_g$ by its kernel density estimator in the likelihood function. The
-maximum likelihood estimator is obtained through a trust region maximization
-algorithm. The likelihood ratio test is performed on the null hypothesis $H_0:$
-$\gamma_{qg}=0$ and $\beta_{qg}=0$ against alternative hypothesis $H_1:$ at
-least one of the two parameters is non-zero. We also consider the hypotheses for
-testing $\gamma_{qg}=0$ and $\beta_{qg}=0$ separately. To adjust for multiple
-comparisons across features, the false discovery discovery rate (FDR) q-value is
-calculated based on the {\tt qvalue} function in {\tt qvalue} package in
-R/Bioconductor.
+For each feature, the likelihood ratio test is performed on the null hypothesis
+$H_0:$ $\gamma_{q}=0$ and $\beta_{q}=0$ against alternative
+hypothesis $H_1:$ at least one of the two parameters is non-zero. We also
+consider the hypotheses for testing $\gamma_{q}=0$ and $\beta_{q}=0$ separately.
+To adjust for multiple comparisons across features, the false discovery
+discovery rate (FDR) q-value is calculated based on the {\tt qvalue} function in
+{\tt qvalue} package in R/Bioconductor (See Reference~
+\cite{storey2003statistical} for details).
+
+
+\subsection{Identification of differentially expressed genes based on
+            single-cell RNA sequencing data}
+In this case, $Y_{i}$ represents the expression (TPM value) of certain
+gene in the $i$th cell, $1-\pi_{i}=Pr(Y_{i}>0)$ is the rate of expression.
+$\boldsymbol{X}_i=(Z_{i},\boldsymbol{W}_i)^T$ is a vector of covariates with
+$Z_{i}$ being a binary indicator of the cell population under comparison and
+$\boldsymbol{W}_i$ being a vector of other covariates, e.g. batch and cellular
+detection rate, and
+$\boldsymbol{\gamma}=(\gamma_Z, \boldsymbol{\gamma}_W)$ and
+$\boldsymbol{\beta}=(\beta_Z, \boldsymbol{\beta}_W)$ are model parameters.
+
+We are interested in identifying genes that are differentially expressed in two
+different cell subpopulations, as quantified by $\gamma_Z$ and $\beta_Z$.
+For each gene, three null hypotheses, i.e. $\beta_Z=0$, $\gamma_Z=0$, and
+$\beta_Z =0 \textrm{ and } \gamma_Z=0$, are examined based on likelihood ratio
+tests.
+Multiple comparison correction is addressed by calculating the false discovery
+discovery rate (q-values) (See Reference~\cite{storey2003statistical} for
+details).
 
 \section{Session Info}
 
