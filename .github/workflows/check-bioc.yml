@@ -168,6 +168,7 @@ jobs:
           install.packages("tinytex")
           tinytex::parse_install(text = "! LaTeX Error: File `ae.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `sectsty.sty' not found.")
+          tinytex::parse_install(text = "! LaTeX Error: File `fancyhdr.sty' not found.")
         shell: Rscript {0}
 
       - name: Install dependencies pass 1
