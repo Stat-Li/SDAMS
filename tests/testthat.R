@@ -1,4 +1,4 @@
 library(testthat)
-library(SDAMS)
+suppressPackageStartupMessages(library(SDAMS))
 
 test_check("SDAMS")
