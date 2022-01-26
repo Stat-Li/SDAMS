@@ -87,7 +87,7 @@ or differential expression analysis for single-cell RNA sequencing data:
 \end{enumerate}
 
 
-<<quick start , eval=FALSE >>=
+<<install , eval=FALSE >>=
 library("SDAMS")
 data("exampleSumExp")
 results <- SDA(exampleSumExp)
@@ -393,7 +393,7 @@ details).
 
 \section{Session Info}
 
-<<sessionInfo, results=tex, print=TRUE, eval=TRUE>>=
+<<sessionInfo, print=TRUE, eval=TRUE>>=
 toLatex(sessionInfo())
 @
 
