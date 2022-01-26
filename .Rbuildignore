@@ -1,2 +1,4 @@
+^renv$
+^renv\.lock$
 ^SDAMS\.Rproj$
 ^\.Rproj\.user$
