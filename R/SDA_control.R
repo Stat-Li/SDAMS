@@ -5,7 +5,7 @@ SDA <- function(sumExp, VOI = NULL, ...){
         stop("Input must be an object of SummarizedExperiment class!")
 
     rawfeature <- assay(sumExp); rawcoldata <- colData(sumExp)
-    newdata <- data_clean(rawfeature)
+    newdata <- check_zero_data(rawfeature)
     newfeature <- newdata$feature
     newcoldata <- as(rawcoldata,"data.frame")
     feat.names <- newdata$feat.names
