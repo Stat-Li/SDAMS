@@ -12,13 +12,15 @@ coefficients. And likelihood ratio test is constructed for differential
 abundance/expression analysis.
 }
 \usage{
-SDA(sumExp, VOI = NULL, ...)
+SDA(sumExp, VOI = NULL, cleanData = TRUE, correctPValues = TRUE, ...)
 }
 
 \arguments{
   \item{sumExp}{An object of 'SummarizedExperiment' class.}
   \item{VOI}{Variable of interest. Default is NULL, when there is only one
   covariate, otherwise it must be one of the column names in colData.}
+  \item{cleanData}{Whether features with more than 10 zero values are removed.}
+  \item{correctPValues}{Should the p-values be corrected automatically using qvalue?}
   \item{...}{Additional arguments passed to \code{\link{qvalue}}.}
 
 }

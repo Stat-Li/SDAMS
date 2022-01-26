@@ -1659,8 +1659,3 @@
       [197] "gene197" "gene198" "gene199" "gene200"
       
 
-# having a feature with > 20 zeros causes warning
-
-    There are 1 features of 200 where more than 1/2 of the samples are zero.
-    Proceed with caution!
-

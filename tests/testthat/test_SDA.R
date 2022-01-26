@@ -31,9 +31,19 @@ test_that("using the SE object works", {
   expect_snapshot(SDA(exampleSE2))
 })
 
-test_that("having a feature with > 20 zeros causes warning", {
-  featureInfo[1, sample(ncol(featureInfo), 21)] <- 0
-  exampleSE3 <- createSEFromMatrix(feature = featureInfo, colData = groupInfo)
-  expect_snapshot_warning(SDA(exampleSE3))
+# test_that("having a feature with > 20 zeros causes warning", {
+#   featureInfo[1, sample(ncol(featureInfo), 21)] <- 0
+#   exampleSE3 <- createSEFromMatrix(feature = featureInfo, colData = groupInfo)
+#   expect_snapshot_warning(SDA(exampleSE3))
+# })
+
+test_that("cleanData argument works", {
+  tmp_res <- SDA(exampleSE2, cleanData = FALSE, correctPValues = FALSE)
+  expect_equal(length(tmp_res$qv_2part), nrow(assay(exampleSE2)))
+  
 })
 
+test_that("correctPValues argument works", {
+  tmp_res <- SDA(exampleSE2, cleanData = TRUE, correctPValues = FALSE)
+  expect_equal(range(tmp_res$qv_2part), c(1, 1))
+})
