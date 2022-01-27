@@ -2,7 +2,7 @@ import("trust")
 import("qvalue")
 import("methods")
 import("SummarizedExperiment")
-import("S4Vectors")
+importFrom("S4Vectors", "SimpleList")
 
 importFrom("stats", "IQR")
 importFrom("stats", "dnorm")
