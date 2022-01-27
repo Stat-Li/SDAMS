@@ -11,7 +11,7 @@ Authors@R: c(
   person("Robert", "Flight", "M", "rflight79@gmail.com", role = "ctb"))
 Depends: R(>= 3.5), SummarizedExperiment
 Suggests: testthat
-Imports: trust, qvalue, methods, stats, utils
+Imports: trust, qvalue, methods, stats, utils, S4Vectors
 Description: This Package utilizes a Semi-parametric Differential 
      Abundance/expression analysis (SDA) method for metabolomics and proteomics 
      data from mass spectrometry as well as single-cell RNA sequencing data. SDA 
