@@ -2,11 +2,13 @@ Package: SDAMS
 Type: Package
 Title: Differential Abundant/Expression Analysis for Metabolomics, Proteomics and 
        single-cell RNA sequencing Data
-Version: 1.15.1
+Version: 1.15.2
 Date: 2021-11-21
-Author: Yuntong Li <yuntong.li@uky.edu>, Chi Wang <chi.wang@uky.edu>, 
-     Li Chen <lichenuky@uky.edu>
-Maintainer: Yuntong Li <yuntong.li@uky.edu>
+Authors@R: c(
+  person("Yuntong", "Li", , "yuntong.li@uky.edu", role = c("cre", "aut")),
+  person("Chi", "Wang", , "chi.wang@uky.edu", role = c("aut")),
+  person("Li", "Chen", , "lichenuky@uky.edu", role = c("aut")),
+  person("Robert", "Flight", "M", "rflight79@gmail.com", role = "ctb"))
 Depends: R(>= 3.5), SummarizedExperiment
 Suggests: testthat
 Imports: trust, qvalue, methods, stats, utils
@@ -15,7 +17,7 @@ Description: This Package utilizes a Semi-parametric Differential
      data from mass spectrometry as well as single-cell RNA sequencing data. SDA 
      is able to robustly handle non-normally distributed data and provides a clear 
      quantification of the effect size.
-License: GPL
+License: GPL (>= 3)
 LazyLoad: no
 NeedsCompilation: no
 biocViews: ImmunoOncology, DifferentialExpression, Metabolomics, Proteomics, MassSpectrometry, SingleCell
