@@ -2,6 +2,7 @@ import("trust")
 import("qvalue")
 import("methods")
 import("SummarizedExperiment")
+importFrom("S4Vectors", "SimpleList")
 
 importFrom("stats", "IQR")
 importFrom("stats", "dnorm")
@@ -11,6 +12,8 @@ importFrom("stats", "pchisq")
 importFrom("stats", "pnorm")
 importFrom("stats", "sd")
 importFrom("utils", "read.csv")
+importFrom("stats", "aggregate")
+
 
 export("createSEFromMatrix")
 export("createSEFromCSV")

@@ -1,10 +1,41 @@
 VERSION 0.99.7
 ----------------------
++ package submission.
 
-package submission.
 
-
-VERSION 1.1.0
+VERSION 1.1.1
 ----------------------
-1. allow adjustment of covariates;
-2. update 'SDA' with additional arguments passed to 'qvalue'.
++  allow adjustment of covariates;
++  update 'SDA' with additional arguments passed to 'qvalue'.
+
+VERSION 1.1.2
+----------------------
++ update NEWS file.
+
+VERSION 1.7.1
+----------------------
++ add reference.
+
+VERSION 1.9.1
+----------------------
++ add example for single-cell data.
+
+VERSION 1.9.2
+----------------------
++ update description for single-cell data in reference manual.
+
+VERSION 1.11.1
+----------------------
++ update reference manual with single-cell RNA sequencing data
+
+VERSION 1.11.2
+----------------------
++ re-upload files under Version 1.11.1
+
+VERSION 1.11.4
+----------------------
++ update vignette with SC RNA sequencing data
+
+VERSION 1.11.5
+----------------------
++ return beta and gamma as matrix

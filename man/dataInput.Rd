@@ -7,13 +7,13 @@
     Mass spectrometry data input
 }
 \description{
-    Two ways to input metabolomics or proteomics data from mass spectrometry as
-\code{SummarizedExperiment}:
+    Two ways to input metabolomics or proteomics data from mass spectrometry or
+    single-cell RNA sequencing data as \code{SummarizedExperiment}:
 
 \enumerate{
 \item \code{createSEFromCSV} creates SummarizedExperiment object from csv files;
 \item \code{createSEFromMatrix} creates SummarizedExperiment object from
-    separate matrices: one for feature data and the other one for colData.
+    separate matrices: one for feature/gene data and the other one for colData.
 }
 
 }
@@ -25,26 +25,28 @@ createSEFromMatrix(feature, colData)
 }
 
 \arguments{
-  \item{featurePath}{path for feature data.}
+  \item{featurePath}{path for feature/gene data.}
 
   \item{colDataPath}{path for colData.}
 
-  \item{rownames1}{indicator for feature data with row names. If NULL, row
+  \item{rownames1}{indicator for feature/gene data with row names. If NULL, row
   numbers are automatically generated.}
 
   \item{rownames2}{indicator for colData with row names. If NULL, row
   numbers are automatically generated.}
 
-  \item{header1}{a logical value indicating whether the first row of feature is
-  column names. The default value is TRUE.}
+  \item{header1}{a logical value indicating whether the first row of
+  feature/gene is column names. The default value is TRUE.}
 
   \item{header2}{a logical value indicating whether the first row of colData is
   column names. The default value is TRUE. If colData input is a vector, set to
   False.}
 
-  \item{feature}{a matrix with row being features and column being subjects.}
+  \item{feature}{a matrix with row being features/genes and column being
+    subjects/cells.}
 
-  \item{colData}{a column type data containing information about the subjects.}
+  \item{colData}{a column type data containing information about the
+  subjects/cells.}
 }
 
 \value{
@@ -76,8 +78,8 @@ exampleSE
 set.seed(100)
 featureInfo <- matrix(runif(800, -2, 5), ncol = 40)
 featureInfo[featureInfo<0] <- 0
-rownames(featureInfo) <- paste("feature", 1:20, sep = '')
-colnames(featureInfo) <- paste('subject', 1:40, sep = '')
+rownames(featureInfo) <- paste("gene", 1:20, sep = '')
+colnames(featureInfo) <- paste('cell', 1:40, sep = '')
 groupInfo <- data.frame(grouping=matrix(sample(0:1, 40, replace = TRUE),
                         ncol = 1))
 rownames(groupInfo) <- colnames(featureInfo)
